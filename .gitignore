@@ -1,0 +1,16 @@
+#npm ignores
+node_modules
+
+#build artifacts
+build/
+dist/
+*.exe
+*.msi
+wix.wixpdb
+wix.wixobj
+
+# ignore vendor folder for now
+vendor/
+
+# ignore babel compile
+/index.js
