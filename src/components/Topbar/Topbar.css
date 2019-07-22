@@ -12,15 +12,15 @@
     color: var(--theme-text-on-primary);
 }
 
-.title {
+.topbar .title {
     font-size: 20px;
 }
 
-.start {
+.topbar .start {
     align-content: flex-start;
     margin-right: 32px;
 }
 
-.end {
-    align-content: flex-end;
+.topbar .end {
+    margin-left: auto;
 }

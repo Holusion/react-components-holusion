@@ -20,7 +20,7 @@ export default class PlaylistItem extends React.Component {
                 </div>
                 <div className="playlist-item-top-right">
                     <button className="playlist-item-remove" onClick={this.props.item.onRemove}>
-                        <Icon name="delete" />
+                        <Icon name="remove" />
                     </button>
                 </div>
             </div>
@@ -28,7 +28,7 @@ export default class PlaylistItem extends React.Component {
     }
 
     createPrimary() {
-        const display = this.props.item.current ? <Icon name="play" width="100" height="100"/> : null;
+        const display = this.props.item.current ? <Icon name="play" width="100" height="100" /> : null;
 
         return (
             <div className="playlist-item-current">

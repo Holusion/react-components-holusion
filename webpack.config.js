@@ -17,17 +17,19 @@ module.exports = {
           use: ["style-loader", "css-loader"]
         },
         {
-          test: /\.(png|jpg|gif|svg)$/,
+          test: /\.svg$/,
           use: [
             {
-              loader: "file-loader",
+              loader: "babel-loader"
+            },
+            {
+              loader: "react-svg-loader",
               options: {
-                name: "[name]-[hash:8].[ext]",
-                publicPath: "../dist"
+                jsx: true
               }
             }
           ]
-        }
+        },
       ]
     },
     resolve: { extensions: ["*", ".js", ".jsx"] },

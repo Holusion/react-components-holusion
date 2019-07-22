@@ -2,29 +2,31 @@
 import PropTypes from 'prop-types'
 import React from "react";
 
-export default class Icon extends React.Component {
+import back from '../../../public/static/icons/back.svg'
+import build from '../../../public/static/icons/build.svg'
+import check from '../../../public/static/icons/check.svg'
+import close from '../../../public/static/icons/close.svg'
+import filter from '../../../public/static/icons/filter.svg'
+import library from '../../../public/static/icons/library.svg'
+import menu from '../../../public/static/icons/menu.svg'
+import pause from '../../../public/static/icons/pause.svg'
+import play from '../../../public/static/icons/play.svg'
+import refresh from '../../../public/static/icons/refresh.svg'
+import remove from '../../../public/static/icons/remove.svg'
+import toggle_off from '../../../public/static/icons/toggle_off.svg'
+import toggle_on from '../../../public/static/icons/toggle_on.svg'
+import upload from '../../../public/static/icons/upload.svg'
 
-  static getNode(n, v) {
-    n = document.createElementNS("http://www.w3.org/2000/svg", n);
-    for (var p in v){
-      n.setAttributeNS(null, p, v[p]);
-    }
-    return n;
-  }
+const icons = {back, build, check, close, filter, library, menu, pause, play, refresh, remove, toggle_off, toggle_on, upload}
 
-  static makeIcon(name){
-    if (!name){
-      name = "default";
-    }
-  }
+export default function Icon(props) {
+  if(icons[props.name]) {
+    const width = props.width ? props.width : "24";
+    const height = props.height ? props.height : "24";
 
-  render() {
-    return (
-      <svg xmlns="http://www.w3.org/2000/svg" width={this.props.width ? this.props.width : "24"} height={this.props.height ? this.props.height : "24"} viewBox="0 0 24 24" fill="currentColor">
-        <use xmlns="http://www.w3.org/1999/xlink" href={`static/icons/combined.svg#icon-${this.props.name}`} />
-      </svg>
-    )
+    return React.createElement(icons[props.name], {width: width, height: height, viewBox: "0 0 24 24", fill: "currentColor"})
   }
+  return null;
 }
 
 Icon.propTypes = {
