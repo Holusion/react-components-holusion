@@ -1,6 +1,6 @@
 {
   "name": "@holusion/react-components-holusion",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "index.js",
   "description": "",
   "scripts": {
@@ -29,5 +29,7 @@
     "webpack": "^4.36.1",
     "webpack-cli": "^3.3.6"
   },
-  "files": ["index.js"]
+  "files": [
+    "index.js"
+  ]
 }
