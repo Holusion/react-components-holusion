@@ -11,8 +11,7 @@ export default class Playlist extends React.Component {
 
     render() {
         const cards = this.props.items.map(item => {
-            let imgUrl = item.image;
-            imgUrl = encodeURI(imgUrl.trim())
+            let imgUrl = ((item.image)?encodeURI(item.image.trim()):undefined);
             return <PlaylistItem 
                         key={item.name} 
                         item={item} 
