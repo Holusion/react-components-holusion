@@ -11,13 +11,13 @@ function createTop(props) {
     return (
         <div className="playlist-item-top">
             <div className="playlist-item-top-left">
-                <Checkbox onChange={props.item.onCheckboxChange} checked={props.item.selected} />
+                <Checkbox onChange={props.onCheckboxChange} checked={props.selected} />
             </div>
             <div className="playlist-item-top-middle">
-                <Switch checked={props.item.active} onChange={props.item.onSwitchChange}/>
+                <Switch checked={props.item.active} onChange={props.onSwitchChange}/>
             </div>
             <div className="playlist-item-top-right">
-                <button className="playlist-item-remove" onClick={props.item.onRemove}>
+                <button className="playlist-item-remove" onClick={props.onRemove}>
                     <Icon name="remove" />
                 </button>
             </div>
@@ -42,7 +42,7 @@ function createBottom(props) {
                 <span>{props.item.name}</span>
             </div>
             <div className="playlist-item-main-action">
-                <ButtonIcon name="play" onClick={props.item.onPlay} />
+                <ButtonIcon name="play" onClick={props.onPlay} />
             </div>
         </div>
     )
@@ -50,7 +50,7 @@ function createBottom(props) {
 
 export default function PlaylistItem(props) {
     return (
-        <div className={`playlist-item ${props.item.selected ? "selected" : ""} ${props.item.active ? "active" : ""} ${props.item.visible ? "visible" : ""}`} onClick={props.item.onClick} title={props.item.name}>
+        <div className={`playlist-item ${props.selected ? "selected" : ""} ${props.item.active ? "active" : ""} ${props.visible ? "visible" : ""}`} onClick={props.onClick} title={props.item.name}>
             <Card top={createTop(props)} primary={createPrimary(props)} bottom={createBottom(props)} image={props.image} />
         </div>
     )
@@ -58,8 +58,27 @@ export default function PlaylistItem(props) {
 
 PlaylistItem.propTypes = {
     item: PropTypes.shape({
-        name: propTypes.string.isRequired,
-        active: propTypes.bool.isRequired,
+        name: PropTypes.string.isRequired,
+        active: PropTypes.bool.isRequired,
+        current: PropTypes.bool,
     }).isRequired,
     image: PropTypes.string,
+    selected: PropTypes.bool,
+    visible: PropTypes.bool,
+    onClick: PropTypes.func,
+    onPlay: PropTypes.func,
+    onRemove: PropTypes.func,
+    onSwitchChange: PropTypes.func,
+    onCheckboxChange: PropTypes.func,
+}
+
+PlaylistItem.defaultProps = {
+    image: undefined,
+    selected: false,
+    visible: true,
+    onClick: () => {},
+    onPlay: () => {},
+    onRemove: () => {},
+    onSwitchChange: () => {},
+    onCheckboxChange: () => {}
 }
