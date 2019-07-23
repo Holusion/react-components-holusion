@@ -7,7 +7,7 @@ export default function Checkbox(props) {
     
     return (
         <div className="checkbox-container">
-            <input type="checkbox" className="checkbox" title={props.title} id={id} defaultChecked={false} onChange={props.onChange}/>
+            <input type="checkbox" className="checkbox" title={props.title} id={id} checked={props.checked} onChange={props.onChange}/>
             <label htmlFor={id} />
         </div>
     )
@@ -15,5 +15,6 @@ export default function Checkbox(props) {
 
 Checkbox.propTypes = {
     title: PropTypes.string,
-    onChange: PropTypes.func
+    onChange: PropTypes.func,
+    checked: PropTypes.bool
 }

@@ -11,7 +11,7 @@ function createTop(props) {
     return (
         <div className="playlist-item-top">
             <div className="playlist-item-top-left">
-                <Checkbox onChange={props.item.onCheckboxChange} />
+                <Checkbox onChange={props.item.onCheckboxChange} checked={props.item.selected} />
             </div>
             <div className="playlist-item-top-middle">
                 <Switch checked={props.item.active} onChange={props.item.onSwitchChange}/>
