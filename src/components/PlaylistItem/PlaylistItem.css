@@ -116,9 +116,9 @@
 }
 
 .playlist-item.visible {
-  animation: adding 0.5s ease-in-out;
+  animation: adding 0.5s forwards;
 }
 
 .playlist-item:not(.visible) {
-  animation: remove 0.5s ease-in-out;
+  animation: remove 0.5s forwards;
 }
