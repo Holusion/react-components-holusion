@@ -3,28 +3,21 @@ import PlaylistItem from "../PlaylistItem";
 import PropTypes from 'prop-types'
 import React from 'react'
 
-export default class Playlist extends React.Component {
+export default function Playlist(props) {
+    const cards = props.items.map(item => {
+        let imgUrl = ((item.image)?encodeURI(item.image.trim()):undefined);
+        return <PlaylistItem 
+                    key={item.name} 
+                    item={item} 
+                    image={imgUrl} 
+                />
+    })
 
-    constructor(props) {
-        super(props);
-    }
-
-    render() {
-        const cards = this.props.items.map(item => {
-            let imgUrl = ((item.image)?encodeURI(item.image.trim()):undefined);
-            return <PlaylistItem 
-                        key={item.name} 
-                        item={item} 
-                        image={imgUrl} 
-                    />
-        })
-
-        return (
-            <div className="playlist-container">
-                {cards}
-            </div>
-        )
-    }
+    return (
+        <div className="playlist-container">
+            {cards}
+        </div>
+    )
 }
 
 /**

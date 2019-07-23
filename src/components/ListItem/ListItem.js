@@ -4,22 +4,13 @@ import Icon from "../Icon";
 import PropTypes from 'prop-types'
 import React from 'react'
 
-export default class ListItem extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-    
-    render() {
-        let icon = null;
-        if(this.props.icon) icon = <div className="list-icon"><Icon name={this.props.icon} /></div>
-
-        return (
-            <li className={`list-item ${this.props.selected ? "selected" : ""}`} onClick={this.props.onClick}>
-                {icon}
-                <span className="list-content">{this.props.children}</span>
-            </li>
-        )
-    }
+export default function ListItem(props) {
+    return (
+        <li className={`list-item ${props.selected ? "selected" : ""}`} onClick={props.onClick}>
+            {props.icon ? <div className="list-icon"><Icon name={props.icon} /></div> : null}
+            <span className="list-content">{props.children}</span>
+        </li>
+    )
 }
 
 ListItem.propTypes = {

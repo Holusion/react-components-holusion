@@ -3,15 +3,12 @@ import Icon from '../Icon';
 import PropTypes from 'prop-types'
 import React from 'react'
 
-export default class Fab extends React.Component {
-
-    render() {
-        return (
-            <div className="fab-container" onClick={this.props.onClick} title={this.props.title}>
-                <Icon name={this.props.icon} />
-            </div>
-        )
-    }
+export default function Fab(props) {
+    return (
+        <div className="fab-container" onClick={props.onClick} title={props.title}>
+            <Icon name={props.icon} />
+        </div>
+    )
 }
 
 Fab.propTypes = {

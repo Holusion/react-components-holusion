@@ -2,26 +2,23 @@ import './Card.css'
 import PropTypes from 'prop-types'
 import React from 'react'
 
-export default class Card extends React.Component {
-
-    render() {
-        return (
-            <div className="card">
-                <div className="card-background-image" style={{backgroundImage: `url(${this.props.image})`}}></div>
-                <div className="card-content">
-                    <div className="card-top">
-                        {this.props.top}
-                    </div>
-                    <div className="card-primary">
-                        {this.props.primary}
-                    </div>
-                    <div className="card-bottom">
-                        {this.props.bottom}
-                    </div>
+export default function Card(props) {
+    return (
+        <div className="card">
+            <div className="card-background-image" style={{backgroundImage: `url(${props.image})`}}></div>
+            <div className="card-content">
+                <div className="card-top">
+                    {props.top}
+                </div>
+                <div className="card-primary">
+                    {props.primary}
+                </div>
+                <div className="card-bottom">
+                    {props.bottom}
                 </div>
             </div>
-        )
-    }
+        </div>
+    )
 }
 
 Card.propTypes = {

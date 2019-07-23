@@ -3,15 +3,12 @@ import Icon from "../Icon";
 import PropTypes from 'prop-types'
 import React from 'react';
 
-export default class ButtonIcon extends React.Component {
-
-    render() {
-        return (
-            <a className="button-icon" onClick={this.props.onClick} title={this.props.title}>
-                <Icon name={this.props.name}/>
-            </a>
-        )
-    }
+export default function ButtonIcon(props) {
+    return (
+        <a className="button-icon" onClick={props.onClick} title={props.title}>
+            <Icon name={props.name}/>
+        </a>
+    )
 }
 
 ButtonIcon.propTypes = {
