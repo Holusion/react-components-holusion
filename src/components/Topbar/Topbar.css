@@ -4,7 +4,6 @@
     display: flex;
     z-index: 9;
     background-color: var(--theme-primary);
-    padding: 16px;
     width: 100%;
     flex-direction: row;
     height: var(--top-app-bar-height);

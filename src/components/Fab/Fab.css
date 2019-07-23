@@ -4,10 +4,8 @@
     position: fixed;
     right: 16px;
     bottom: 16px;
-    padding: 16px;
+    padding: 14px 16px;
     margin-right: 16px;
-    width: 56px;
-    height: 56px;
     border-radius: 50%;
     background-color: var(--theme-secondary);
     color: white;

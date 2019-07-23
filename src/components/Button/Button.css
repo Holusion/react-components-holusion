@@ -4,7 +4,6 @@
     display: flex;
     min-width: 64px;
     height: 32px;
-    padding: 16px;
     vertical-align: middle;
     background-color: var(--theme-primary);
     color: var(--theme-text-on-primary);

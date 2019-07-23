@@ -29,7 +29,7 @@
   display: flex;
   color: white;
   margin: 0;
-  padding: 16px;
+  /* padding: 16px; */
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: row;
@@ -44,12 +44,15 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  margin-left: 16px;
 }
 
 .playlist-item .playlist-item-title span {
   position: absolute;
-  bottom: 0;
+  top: 16px;
+  left: 0;
   white-space: nowrap;
+  vertical-align: middle;
   transform: translateX(0);
   transition: 1s;
 }
@@ -91,6 +94,7 @@
 .playlist-item-top-right {
   position: absolute;
   right: 2px;
+  top: 0;
 }
 
 .playlist-item-remove {
