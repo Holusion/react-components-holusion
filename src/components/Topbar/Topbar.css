@@ -1,6 +1,7 @@
 @import url("../../variables.css");
 
 .topbar {
+    box-sizing: border-box;
     display: flex;
     z-index: 9;
     background-color: var(--theme-primary);
@@ -9,6 +10,7 @@
     height: var(--top-app-bar-height);
     align-items: center;
     color: var(--theme-text-on-primary);
+    padding-left: 16px;
 }
 
 .topbar .title {
@@ -22,4 +24,5 @@
 
 .topbar .end {
     margin-left: auto;
+    margin-right: 16px;
 }
