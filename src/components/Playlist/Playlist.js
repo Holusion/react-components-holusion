@@ -9,7 +9,8 @@ export default function Playlist(props) {
         return <PlaylistItem 
                     key={item.name} 
                     item={item} 
-                    image={imgUrl} 
+                    image={imgUrl}
+                    {...item.options}
                 />
     })
 
@@ -27,17 +28,19 @@ export default function Playlist(props) {
  *   "rank": int,
  *   "active": bool,
  *   "_id": string,
- *   "onCheckboxChange": func(item, event),
- *   "onSwitchChange": func(item, event),
- *   "onClick": func(item, event),
- *   "onPlay": func(item, event),
- *   "onRemove": func(item, event),
- *   "current": bool,
- *   "selected": bool,
- *   "visible": bool,
- *   "image": string
+ *   "options": {   
+ *      "onCheckboxChange": func(item, event),
+ *      "onSwitchChange": func(item, event),
+ *      "onClick": func(item, event),
+ *      "onPlay": func(item, event),
+ *      "onRemove": func(item, event),
+ *      "current": bool,
+ *      "selected": bool,
+ *      "visible": bool,
+ *      "image": string
+ *   }
  * },
  */
 Playlist.propTypes = {
-    items: PropTypes.arrayOf(PropTypes.object), 
+    items: PropTypes.arrayOf(PropTypes.object),
 }

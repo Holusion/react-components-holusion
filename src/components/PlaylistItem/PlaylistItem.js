@@ -26,7 +26,7 @@ function createTop(props) {
 }
 
 function createPrimary(props) {
-    const display = props.item.current ? <Icon name="play" width="100" height="100" /> : null;
+    const display = props.current ? <Icon name="play" width="100" height="100" /> : null;
 
     return (
         <div className="playlist-item-current">
@@ -60,9 +60,9 @@ PlaylistItem.propTypes = {
     item: PropTypes.shape({
         name: PropTypes.string.isRequired,
         active: PropTypes.bool.isRequired,
-        current: PropTypes.bool,
     }).isRequired,
     image: PropTypes.string,
+    current: PropTypes.bool,
     selected: PropTypes.bool,
     visible: PropTypes.bool,
     onClick: PropTypes.func,
