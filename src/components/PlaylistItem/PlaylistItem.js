@@ -58,8 +58,8 @@ export default function PlaylistItem(props) {
 
 PlaylistItem.propTypes = {
     item: PropTypes.shape({
-        name: propTypes.string.isRequired,
-        active: propTypes.bool.isRequired,
+        name: PropTypes.string.isRequired,
+        active: PropTypes.bool.isRequired,
     }).isRequired,
     image: PropTypes.string,
 }
