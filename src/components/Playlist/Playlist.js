@@ -34,6 +34,7 @@ export default function Playlist(props) {
  *   "onRemove": func(item, event),
  *   "current": bool,
  *   "selected": bool,
+ *   "visible": bool,
  *   "image": string
  * },
  */
