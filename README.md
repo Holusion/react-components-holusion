@@ -37,16 +37,29 @@ the props item should have this properties :
     "name": string,
     "rank": int,
     "active": bool,
+    "_id": string
+}
+```
+
+You can had options like this : 
+
+```javascript
+{
+    "name": string,
+    "rank": int,
+    "active": bool,
     "_id": string,
-    "onCheckboxChange": func(item, event),
-    "onSwitchChange": func(item, event),
-    "onClick": func(item, event),
-    "onPlay": func(item, event),
-    "onRemove": func(item, event),
-    "current": bool,
-    "selected": bool,
-    "visible": bool,
-    "image": string
+    "options": {
+        "onCheckboxChange": func(item, event),
+        "onSwitchChange": func(item, event),
+        "onClick": func(item, event),
+        "onPlay": func(item, event),
+        "onRemove": func(item, event),
+        "current": bool,
+        "selected": bool,
+        "visible": bool,
+        "image": string
+    }
 }
 ```
 
