@@ -1,12 +1,12 @@
 {
   "name": "@holusion/react-components-holusion",
   "version": "0.0.3",
-  "main": "index.js",
+  "main": "dist/index.js",
   "description": "",
   "scripts": {
     "watch": "webpack --watch",
-    "build": "webpack",
-    "prepare": "npm run build --mode=production",
+    "build": "webpack  --mode=production",
+    "prepare": "npm run build",
     "test": "jest"
   },
   "author": "Yann DUBOIS <y.dubois@holusion.com>",
@@ -36,8 +36,8 @@
     "webpack-cli": "^3.3.6"
   },
   "files": [
-    "index.js",
-    "public/**/*"
+    "dist/index.js",
+    "dist/public/**/*"
   ],
   "jest": {
     "moduleNameMapper": {

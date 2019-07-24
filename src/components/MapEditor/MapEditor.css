@@ -1,0 +1,13 @@
+
+.map-editor-container{
+  width: 100%;
+}
+.map-editor-container .map-editor-line{
+  display: flex;
+  flex-direction: row;
+  justify-content: stretch;
+}
+
+.map-editor-container .map-editor-line .line-value{
+  flex-grow: 1;
+}
