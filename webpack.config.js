@@ -1,10 +1,11 @@
 const path = require("path");
 const webpack = require("webpack");
+const {CleanWebpackPlugin} = require("clean-webpack-plugin");
 
 module.exports = {
     entry: "./src/index.js",
-    target: "electron-renderer",
     mode: "development",
+    target: "web",
     module: {
       rules: [
         {
@@ -32,11 +33,35 @@ module.exports = {
         },
       ]
     },
-    resolve: { extensions: ["*", ".js", ".jsx"] },
+    externals: {
+      react: {          
+        commonjs: "react",          
+        commonjs2: "react",          
+        amd: "React",          
+        root: "React"      
+      },      
+      "react-dom": {          
+          commonjs: "react-dom",          
+          commonjs2: "react-dom",          
+          amd: "ReactDOM",          
+          root: "ReactDOM"      
+      }  
+    },
+    resolve: { 
+      extensions: ["*", ".js", ".jsx"],
+      alias: { 
+          'react': path.resolve(__dirname, './node_modules/react') ,
+          'react-dom': path.resolve(__dirname, './node_modules/react-dom')
+      }
+    },
     output: {
       path: __dirname,
       filename: "index.js",
-      libraryTarget: 'commonjs2'
+      library: '',
+      libraryTarget: 'umd'
     },
-    plugins: [new webpack.HotModuleReplacementPlugin()]
+    plugins: [
+      new webpack.HotModuleReplacementPlugin(),
+      new CleanWebpackPlugin()
+    ]
   };
