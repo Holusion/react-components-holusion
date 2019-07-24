@@ -31,12 +31,13 @@ function AddMapLine(props){
       <Button onClick={e=>setActive(true)} style={{flexGrow:1}}><Icon name="menu"></Icon>Add</Button>
       </div>)
   }
-  function handleSubmit(e){
-    console.log("form submission", e);
-  }
-  return (<form className="map-editor-line new-line" onSubmit={handleSubmit}>
-    <input type="text" className="line-name" id="confName" placeholder="identifiant"/>
-    <input type="text" className="line-value" id="confValue" placeholder="valeur"/>
+
+  const confName = React.createRef();
+  const confValue = React.createRef();
+
+  return (<form className="map-editor-line new-line" onSubmit={e=> props.handleAdd(confName.current.value, confValue.current.value)}>
+    <input type="text" className="line-name" id="confName" placeholder="identifiant" ref={confName}/>
+    <input type="text" className="line-value" id="confValue" placeholder="valeur" ref={confValue}/>
     <Button type="submit"><Icon name="play" /></Button>
   </form>)
 }
@@ -44,20 +45,27 @@ function AddMapLine(props){
 
 export default function MapEditor(props){
   const [items, setItems] = useState(props.items);
+  console.log("render MapEditor")
   const children = [];
 
   for (const [key, value] of items){
     children.push(<MapLine key={key} name={key} value={value} handleRemove={(name)=>{
       const newItems = items.filter(([keyName])=> keyName != name);
       setItems(newItems);
-      console.log("Set items to : ", newItems)
       props.onChange(newItems);
     }}/>)
   }
+
   return (
     <div className="map-editor-container">
       {children}
-      <AddMapLine/>
+      <AddMapLine handleAdd={(name, value)=> {
+        const newItems = Array.from(items);
+        newItems.push([name, value]);
+        console.log("Set shortcuts to :", newItems);
+        setItems(newItems);
+        props.onChange(newItems);
+      }}/>
     </div>
   )
 }
