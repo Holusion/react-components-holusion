@@ -5,8 +5,22 @@ import PropTypes from 'prop-types'
 import React, { useState, useEffect } from 'react'
 
 import * as network from '../../api/network'
-import {SocketProvider, useSocket} from '../../hooks/useSocket';
+import {useSocket} from '../../hooks/useSocket';
 
+function updateCurrent(url, setCurrent) {
+    let res = fetch(`http://${url}/control/current`).then(res => {
+        if(res && res.status == 200) {
+            res.json().then(current => setCurrent(current))
+        }
+    })
+}
+
+function updatePlaylist(url, setPlaylist, setCurrent) {
+    network.getPlaylist(url).then((playlist) => {
+        setPlaylist([...playlist]);
+        updateCurrent(url, setCurrent);
+    })
+}
 
 export default function Playlist(props) {
     const [selected, setSelected] = useState([]);
@@ -14,33 +28,10 @@ export default function Playlist(props) {
     const [playlist, setPlaylist] = useState([]);
     const [current, setCurrent] = useState({});
     
-    function updateCurrent(url, setCurrent) {
-        network.getCurrent(url).then((current) => setCurrent(current));
-    }
+    useEffect(() => updatePlaylist(props.url, setPlaylist, setCurrent), [props.url, playlist]);
+    useEffect(() => updateCurrent(props.url, setCurrent), current);
     
-    function updatePlaylist(url, setPlaylist, setCurrent) {
-        network.getPlaylist(url).then((playlist) => {
-            setPlaylist([...playlist]);
-            updateCurrent(url, setCurrent);
-        })
-    }
-    
-    function onSynchronize(eventName, url, setCurrent) {
-        switch(eventName) {
-            case "current-playlist":
-                updateCurrent(url, setCurrent);
-                break;
-            default:
-                return;
-        }
-    }
-
-    
-    useEffect(() => {
-        updatePlaylist(props.url, setPlaylist, setCurrent);
-    }, [props.url, playlist])
-    
-    const socket = useSocket('current-playlist', () => updateCurrent(url, setCurrent));
+    useSocket('current-playlist', () => updateCurrent(url, setCurrent));
     
     const cards = playlist.map(item => {
         let imgUrl = encodeURI(`http://${props.url}/medias/${item.name}?thumb=true`.trim());
@@ -48,7 +39,7 @@ export default function Playlist(props) {
             key={item.name} 
             item={item} 
             image={imgUrl}
-            {...item.options}
+            current={current.name == item.name}
         />
     })
 
