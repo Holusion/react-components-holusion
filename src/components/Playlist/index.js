@@ -8,7 +8,7 @@ import * as network from '../../api/network'
 import {useSocket} from '../../hooks/useSocket';
 
 function updateCurrent(url, setCurrent) {
-    let res = fetch(`http://${url}/control/current`).then(res => {
+    fetch(`http://${url}/control/current`).then(res => {
         if(res && res.status == 200) {
             res.json().then(current => setCurrent(current))
         }
@@ -16,9 +16,17 @@ function updateCurrent(url, setCurrent) {
 }
 
 function updatePlaylist(url, setPlaylist, setCurrent) {
-    network.getPlaylist(url).then((playlist) => {
-        setPlaylist([...playlist]);
-        updateCurrent(url, setCurrent);
+    fetch(`http://${url}/playlist`).then(res => {
+        if(res && res.ok) {
+            res.json().then(playlist => {
+                setPlaylist(playlist);
+                updateCurrent(url, setCurrent);
+            })   
+        } else if(res.status == 204) {
+            setPlaylist([]);
+        } else {
+            throw new Error(`${res.status} - ${res.statusText}`);
+        }
     })
 }
 

@@ -92,14 +92,6 @@ export async function getPlaylist(url) {
     return r;
 }
 
-export async function getCurrent(url) {
-    let res = await fetch(`http://${url}/control/current`);
-    if(res && res.status == 200) {
-        return await res.json();
-
-    }
-}
-
 export async function toggleActivation(url, elem) {
     let info = {name: elem.name, path: elem.path, rank: elem.rank}
     return await this.requestUpdate(url, "put", "/playlist", Object.assign(info,{active:elem.active}));
