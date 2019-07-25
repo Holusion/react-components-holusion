@@ -7,6 +7,7 @@
 
 .switch:not(:checked) + label, .switch:checked + label {
     position: relative;
+    display: block;
     cursor: pointer;
 }
 
