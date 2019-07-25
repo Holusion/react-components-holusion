@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "description": "",
   "scripts": {
-    "watch": "webpack --watch",
+    "watch": "webpack --watch --mode=development",
     "build": "webpack  --mode=production",
     "prepare": "npm run build",
     "test": "jest"
@@ -15,7 +15,8 @@
   "peerDependencies": {
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-scripts": "^3.0.1"
+    "react-scripts": "^3.0.1",
+    "socket.io-client": "^2.2.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.5.5",
@@ -32,6 +33,7 @@
     "react-scripts": "^3.0.1",
     "react-svg-loader": "^3.0.3",
     "react-test-renderer": "^16.8.6",
+    "socket.io-client": "^2.2.0",
     "webpack": "^4.36.1",
     "webpack-cli": "^3.3.6"
   },
