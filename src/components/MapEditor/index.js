@@ -11,8 +11,8 @@ import './MapEditor.css';
 function MapLine(props){
   return (
     <form className="map-editor-line">
-      <input type="text" className="line-name" id="confName" placeholder="identifiant" value={props.name} readOnly={true} />
-      <input type="text" className="line-value" id="confValue" placeholder="valeur" value={props.value} readOnly={true}/>
+      <input type="text" size="8" className="line-name" id="confName" placeholder="identifiant" value={props.name} readOnly={true} />
+      <input type="text" size="10" className="line-value" id="confValue" placeholder="valeur" value={props.value} readOnly={true}/>
       <Button onClick={(e)=>props.handleRemove(props.name)}><Icon name="remove" /></Button>
     </form>
   )
