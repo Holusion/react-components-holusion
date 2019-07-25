@@ -3,24 +3,23 @@ import "./Playlist.css"
 import PlaylistItem from "../PlaylistItem";
 import PropTypes from 'prop-types'
 import React, { useState, useEffect } from 'react'
-
-import * as network from '../../api/network'
 import {useSocket} from '../../hooks/useSocket';
+import url from 'url'
 
-function updateCurrent(url, setCurrent) {
-    fetch(`http://${url}/control/current`).then(res => {
+function updateCurrent(playlistUrl, setCurrent) {
+    fetch(url.resolve(`http://${playlistUrl}`, "/control/current")).then(res => {
         if(res && res.status == 200) {
             res.json().then(current => setCurrent(current))
         }
     })
 }
 
-function updatePlaylist(url, setPlaylist, setCurrent) {
-    fetch(`http://${url}/playlist`).then(res => {
+function updatePlaylist(playlistUrl, setPlaylist, setCurrent) {
+    fetch(url.resolve(`http://${playlistUrl}`, `/playlist`)).then(res => {
         if(res && res.ok) {
             res.json().then(playlist => {
                 setPlaylist(playlist);
-                updateCurrent(url, setCurrent);
+                updateCurrent(playlistUrl, setCurrent);
             })   
         } else if(res.status == 204) {
             setPlaylist([]);
@@ -39,10 +38,10 @@ export default function Playlist(props) {
     useEffect(() => updatePlaylist(props.url, setPlaylist, setCurrent), [props.url, playlist]);
     useEffect(() => updateCurrent(props.url, setCurrent), current);
     
-    useSocket('current-playlist', () => updateCurrent(url, setCurrent));
+    useSocket('current-playlist', () => updateCurrent(props.url, setCurrent));
     
     const cards = playlist.map(item => {
-        let imgUrl = encodeURI(`http://${props.url}/medias/${item.name}?thumb=true`.trim());
+        let imgUrl = encodeURI(url.resolve(`http://${props.url}`, `/medias/${item.name}?thumb=true`).trim());
         return <PlaylistItem 
             key={item.name} 
             item={item} 
