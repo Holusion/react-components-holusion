@@ -107,8 +107,7 @@ export default function Playlist(props) {
     const [playlist, setPlaylist] = useState([]);
     const [current, setCurrent] = useState({});
     
-    useEffect(() => updatePlaylist(props.url, setPlaylist, setCurrent), [props.url, playlist]);
-    useEffect(() => updateCurrent(props.url, setCurrent), current);
+    useEffect(() => updatePlaylist(props.url, setPlaylist, setCurrent), [props.url]);
     
     useSocket('current-playlist', () => updateCurrent(props.url, setCurrent));
     
