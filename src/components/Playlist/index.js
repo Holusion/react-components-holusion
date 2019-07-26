@@ -37,6 +37,22 @@ function remove(playlistUrl, item, setPlaylist, setCurrent) {
     })
 }
 
+function setActive(playlistUrl, item, setPlaylist, setCurrent) {
+    let options = {
+        method: 'PUT',
+        body: JSON.stringify(Object.assign(item,{active:!item.active})),
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    }
+    fetch(url.resolve(`http://${playlistUrl}`, `/playlist`), options).then(res => {
+        updatePlaylist(playlistUrl, setPlaylist, setCurrent)
+        if(!res.ok) {
+            throw new Error(`${res.status} - ${res.statusText}`);
+        }
+    })
+}
+
 function select(item, selected, setSelected) {
     setSelected([...selected, item])
 }
@@ -108,6 +124,7 @@ export default function Playlist(props) {
             onClick={(event) => handleClick(props.url, item, selected, setSelected, event)}
             onCheckboxChange={() => handleCheckboxChange(item, selected, setSelected)}
             onRemove={() => remove(props.url, item, setPlaylist, setCurrent)}
+            onSwitchChange={() => setActive(props.url, item, setPlaylist, setCurrent)}
         />
     })
 
@@ -118,26 +135,6 @@ export default function Playlist(props) {
     )
 }
 
-/**
- * the shape of an item is :
- * {
- *   "name": string,
- *   "rank": int,
- *   "active": bool,
- *   "_id": string,
- *   "options": {   
- *      "onCheckboxChange": func(item, event),
- *      "onSwitchChange": func(item, event),
- *      "onClick": func(item, event),
- *      "onPlay": func(item, event),
- *      "onRemove": func(item, event),
- *      "current": bool,
- *      "selected": bool,
- *      "visible": bool,
- *      "image": string
- *   }
- * },
- */
 Playlist.propTypes = {
     url: PropTypes.string.isRequired
 }
