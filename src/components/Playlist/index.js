@@ -26,7 +26,7 @@ function play(props, item) {
     })
 }
 
-function remove(props, item, setPlaylist, setCurrent) {
+function remove(props, item) {
     props.onTaskStart(`remove-${item.name}`);
     let options = {
         method: 'DELETE',
@@ -40,7 +40,6 @@ function remove(props, item, setPlaylist, setCurrent) {
             const err = new Error(`${res.status} - ${res.statusText}`);
             props.onTaskEnd(`remove-${item.name}`, err);    
         } else {
-            updatePlaylist(props, setPlaylist, setCurrent)
             props.onTaskEnd(`remove-${item.name}`);            
         }
     }).catch(err => {
@@ -128,6 +127,7 @@ export default function Playlist(props) {
     
     useSocket('current', () => updateCurrent(props, setCurrent));
     useSocket('insert', () => updatePlaylist(props, setPlaylist, setCurrent));
+    useSocket('remove', () => updatePlaylist(props, setPlaylist, setCurrent));
     
     const cards = playlist.map(item => {
         let imgUrl = encodeURI(url.resolve(`http://${props.url}`, `/medias/${item.name}?thumb=true`).trim());
@@ -140,7 +140,7 @@ export default function Playlist(props) {
             onPlay={() => play(props, item)}
             onClick={(event) => handleClick(props, item, selected, setSelected, event)}
             onCheckboxChange={() => handleCheckboxChange(item, selected, setSelected)}
-            onRemove={() => remove(props, item, setPlaylist, setCurrent)}
+            onRemove={() => remove(props, item)}
             onSwitchChange={() => setActive(props, item, setPlaylist, setCurrent)}
         />
     })
