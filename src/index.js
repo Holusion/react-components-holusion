@@ -16,4 +16,5 @@ export {default as Topbar} from './components/Topbar'
 export {default as Config} from './components/Config'
 export {default as MapEditor} from './components/MapEditor'
 export {default as Radio} from './components/Radio'
+export {default as uploader} from './components/Upload' 
 export {SocketProvider, useSocket} from './hooks/useSocket';
