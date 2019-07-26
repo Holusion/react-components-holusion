@@ -20,6 +20,18 @@ function play(playlistUrl, item) {
     })
 }
 
+function select(item, selected, setSelected) {
+    setSelected([...selected, item])
+}
+
+function unselectItem(item, selected, setSelected) {
+    setSelected(selected.filter(elem => elem.name !== item.name))
+}
+
+function selectOneItem(item, setSelected) {
+    setSelected([item]);
+}
+
 function updateCurrent(playlistUrl, setCurrent) {
     fetch(url.resolve(`http://${playlistUrl}`, "/control/current")).then(res => {
         if(res && res.status == 200) {
@@ -43,9 +55,22 @@ function updatePlaylist(playlistUrl, setPlaylist, setCurrent) {
     })
 }
 
+function handleClick(playlistUrl, item, selected, setSelected, event) {
+    if(event.target.className === "card") {
+        if(selected.filter(elem => item.name === elem.name).length > 0) {
+            play(playlistUrl, item);
+        }
+        selectOneItem(item, setSelected);
+    }
+}
+
+function handleCheckboxChange(item, selected, setSelected) {
+    const isSelected = selected.filter(elem => item.name === elem.name).length > 0;
+    isSelected ? unselectItem(item, selected, setSelected) : select(item, selected, setSelected);
+}
+
 export default function Playlist(props) {
     const [selected, setSelected] = useState([]);
-    const [removed, setRemoved] = useState([]);
     const [playlist, setPlaylist] = useState([]);
     const [current, setCurrent] = useState({});
     
@@ -61,7 +86,10 @@ export default function Playlist(props) {
             item={item} 
             image={imgUrl}
             current={current.name == item.name}
+            selected={selected.filter(elem => item.name === elem.name).length > 0}
             onPlay={() => play(props.url, item)}
+            onClick={(event) => handleClick(props.url, item, selected, setSelected, event)}
+            onCheckboxChange={() => handleCheckboxChange(item, selected, setSelected)}
         />
     })
 
