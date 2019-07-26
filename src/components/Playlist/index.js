@@ -6,6 +6,20 @@ import React, { useState, useEffect } from 'react'
 import {useSocket} from '../../hooks/useSocket';
 import url from 'url'
 
+function play(playlistUrl, item) {
+    let options = {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    }
+    fetch(url.resolve(`http://${playlistUrl}`, `/control/current/${item.name}`), options).then(res => {    
+        if(!res.ok) {
+            throw new Error(`${res.status} - ${res.statusText}`);
+        }
+    })
+}
+
 function updateCurrent(playlistUrl, setCurrent) {
     fetch(url.resolve(`http://${playlistUrl}`, "/control/current")).then(res => {
         if(res && res.status == 200) {
@@ -47,6 +61,7 @@ export default function Playlist(props) {
             item={item} 
             image={imgUrl}
             current={current.name == item.name}
+            onPlay={() => play(props.url, item)}
         />
     })
 
