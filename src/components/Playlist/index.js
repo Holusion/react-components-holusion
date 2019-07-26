@@ -40,6 +40,7 @@ function remove(props, item) {
             const err = new Error(`${res.status} - ${res.statusText}`);
             props.onTaskEnd(`remove-${item.name}`, err);    
         } else {
+            item.visible = false;
             props.onTaskEnd(`remove-${item.name}`);            
         }
     }).catch(err => {
@@ -127,7 +128,9 @@ export default function Playlist(props) {
     
     useSocket('current', () => updateCurrent(props, setCurrent));
     useSocket('insert', () => updatePlaylist(props, setPlaylist, setCurrent));
-    useSocket('remove', () => updatePlaylist(props, setPlaylist, setCurrent));
+    useSocket('remove', () => setTimeout(() => {
+        updatePlaylist(props, setPlaylist, setCurrent);
+    }, 1000));
     
     const cards = playlist.map(item => {
         let imgUrl = encodeURI(url.resolve(`http://${props.url}`, `/medias/${item.name}?thumb=true`).trim());
@@ -136,6 +139,7 @@ export default function Playlist(props) {
             item={item} 
             image={imgUrl}
             current={current.name == item.name}
+            visible = {item.visible != null ? false : true}
             selected={selected.filter(elem => item.name === elem.name).length > 0}
             onPlay={() => play(props, item)}
             onClick={(event) => handleClick(props, item, selected, setSelected, event)}
