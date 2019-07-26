@@ -113,7 +113,7 @@ export default function Playlist(props) {
     
     useEffect(() => updatePlaylist(props, setPlaylist, setCurrent), [props.url]);
     
-    useSocket('current-playlist', () => updateCurrent(props, setCurrent));
+    useSocket('current', () => updateCurrent(props, setCurrent));
     
     const cards = playlist.map(item => {
         let imgUrl = encodeURI(url.resolve(`http://${props.url}`, `/medias/${item.name}?thumb=true`).trim());

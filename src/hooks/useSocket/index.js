@@ -9,7 +9,7 @@ export function useSocket(eventKey, callback) {
     useEffect(() => {
         if(eventKey) {
             const socketHandler = () => callbackRef.current && callbackRef.current.apply(this, arguments);
-            socket.on(() => socketHandler);
+            socket.on(eventKey, socketHandler);
             return () => socket.removeListener(eventKey, socketHandler);
         }
     }, [eventKey]);
