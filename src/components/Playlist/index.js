@@ -20,6 +20,23 @@ function play(playlistUrl, item) {
     })
 }
 
+function remove(playlistUrl, item, setPlaylist, setCurrent) {
+    let options = {
+        method: 'DELETE',
+        body: null,
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    }
+    fetch(url.resolve(`http://${playlistUrl}`, `/medias/${item.name}`), options).then(res => {    
+        if(!res.ok) {
+            throw new Error(`${res.status} - ${res.statusText}`);
+        } else {
+            updatePlaylist(playlistUrl, setPlaylist, setCurrent)
+        }
+    })
+}
+
 function select(item, selected, setSelected) {
     setSelected([...selected, item])
 }
@@ -90,6 +107,7 @@ export default function Playlist(props) {
             onPlay={() => play(props.url, item)}
             onClick={(event) => handleClick(props.url, item, selected, setSelected, event)}
             onCheckboxChange={() => handleCheckboxChange(item, selected, setSelected)}
+            onRemove={() => remove(props.url, item, setPlaylist, setCurrent)}
         />
     })
 
