@@ -16,15 +16,18 @@ function play(props, item) {
     }
     fetch(url.resolve(`http://${props.url}`, `/control/current/${item.name}`), options).then(res => {    
         if(!res.ok) {
-            const error = new Error(`${res.status} - ${res.statusText}`);
-            props.onTaskEnd(`play-${item.name}`, error);
+            const err = new Error(`${res.status} - ${res.statusText}`);
+            props.onTaskEnd(`play-${item.name}`, err);
         } else {
             props.onTaskEnd(`play-${item.name}`);
         }
+    }).catch(err => {
+        props.onTaskEnd(`play-${item.name}`, err)
     })
 }
 
 function remove(props, item, setPlaylist, setCurrent) {
+    props.onTaskStart(`remove-${item.name}`);
     let options = {
         method: 'DELETE',
         body: null,
@@ -34,14 +37,19 @@ function remove(props, item, setPlaylist, setCurrent) {
     }
     fetch(url.resolve(`http://${props.url}`, `/medias/${item.name}`), options).then(res => {    
         if(!res.ok) {
-            throw new Error(`${res.status} - ${res.statusText}`);
+            const err = new Error(`${res.status} - ${res.statusText}`);
+            props.onTaskEnd(`remove-${item.name}`, err);    
         } else {
             updatePlaylist(props, setPlaylist, setCurrent)
+            props.onTaskEnd(`remove-${item.name}`);            
         }
+    }).catch(err => {
+        props.onTaskEnd(`remove-${item.name}`, err);   
     })
 }
 
 function setActive(props, item, setPlaylist, setCurrent) {
+    props.onTaskStart(`active-${item.name}`);
     let options = {
         method: 'PUT',
         body: JSON.stringify(Object.assign(item,{active:!item.active})),
@@ -52,8 +60,13 @@ function setActive(props, item, setPlaylist, setCurrent) {
     fetch(url.resolve(`http://${props.url}`, `/playlist`), options).then(res => {
         updatePlaylist(props, setPlaylist, setCurrent)
         if(!res.ok) {
-            throw new Error(`${res.status} - ${res.statusText}`);
+            const err = new Error(`${res.status} - ${res.statusText}`);
+            props.onTaskEnd(`active-${item.name}`, err);            
+        } else {
+            props.onTaskEnd(`active-${item.name}`);
         }
+    }).catch(err => {
+        props.onTaskEnd(`active-${item.name}`, err);
     })
 }
 
