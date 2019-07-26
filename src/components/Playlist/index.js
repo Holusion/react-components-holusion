@@ -6,21 +6,25 @@ import React, { useState, useEffect } from 'react'
 import {useSocket} from '../../hooks/useSocket';
 import url from 'url'
 
-function play(playlistUrl, item) {
+function play(props, item) {
+    props.onTaskStart(`play-${item.name}`)
     let options = {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
     }
-    fetch(url.resolve(`http://${playlistUrl}`, `/control/current/${item.name}`), options).then(res => {    
+    fetch(url.resolve(`http://${props.url}`, `/control/current/${item.name}`), options).then(res => {    
         if(!res.ok) {
-            throw new Error(`${res.status} - ${res.statusText}`);
+            const error = new Error(`${res.status} - ${res.statusText}`);
+            props.onTaskEnd(`play-${item.name}`, error);
+        } else {
+            props.onTaskEnd(`play-${item.name}`);
         }
     })
 }
 
-function remove(playlistUrl, item, setPlaylist, setCurrent) {
+function remove(props, item, setPlaylist, setCurrent) {
     let options = {
         method: 'DELETE',
         body: null,
@@ -28,16 +32,16 @@ function remove(playlistUrl, item, setPlaylist, setCurrent) {
             'Content-Type': 'application/json'
         },
     }
-    fetch(url.resolve(`http://${playlistUrl}`, `/medias/${item.name}`), options).then(res => {    
+    fetch(url.resolve(`http://${props.url}`, `/medias/${item.name}`), options).then(res => {    
         if(!res.ok) {
             throw new Error(`${res.status} - ${res.statusText}`);
         } else {
-            updatePlaylist(playlistUrl, setPlaylist, setCurrent)
+            updatePlaylist(props, setPlaylist, setCurrent)
         }
     })
 }
 
-function setActive(playlistUrl, item, setPlaylist, setCurrent) {
+function setActive(props, item, setPlaylist, setCurrent) {
     let options = {
         method: 'PUT',
         body: JSON.stringify(Object.assign(item,{active:!item.active})),
@@ -45,8 +49,8 @@ function setActive(playlistUrl, item, setPlaylist, setCurrent) {
             'Content-Type': 'application/json'
         },
     }
-    fetch(url.resolve(`http://${playlistUrl}`, `/playlist`), options).then(res => {
-        updatePlaylist(playlistUrl, setPlaylist, setCurrent)
+    fetch(url.resolve(`http://${props.url}`, `/playlist`), options).then(res => {
+        updatePlaylist(props, setPlaylist, setCurrent)
         if(!res.ok) {
             throw new Error(`${res.status} - ${res.statusText}`);
         }
@@ -65,20 +69,20 @@ function selectOneItem(item, setSelected) {
     setSelected([item]);
 }
 
-function updateCurrent(playlistUrl, setCurrent) {
-    fetch(url.resolve(`http://${playlistUrl}`, "/control/current")).then(res => {
+function updateCurrent(props, setCurrent) {
+    fetch(url.resolve(`http://${props.url}`, "/control/current")).then(res => {
         if(res && res.status == 200) {
             res.json().then(current => setCurrent(current))
         }
     })
 }
 
-function updatePlaylist(playlistUrl, setPlaylist, setCurrent) {
-    fetch(url.resolve(`http://${playlistUrl}`, `/playlist`)).then(res => {
+function updatePlaylist(props, setPlaylist, setCurrent) {
+    fetch(url.resolve(`http://${props.url}`, `/playlist`)).then(res => {
         if(res && res.ok) {
             res.json().then(playlist => {
                 setPlaylist(playlist);
-                updateCurrent(playlistUrl, setCurrent);
+                updateCurrent(props, setCurrent);
             })   
         } else if(res.status == 204) {
             setPlaylist([]);
@@ -88,10 +92,10 @@ function updatePlaylist(playlistUrl, setPlaylist, setCurrent) {
     })
 }
 
-function handleClick(playlistUrl, item, selected, setSelected, event) {
+function handleClick(props, item, selected, setSelected, event) {
     if(event.target.className === "card") {
         if(selected.filter(elem => item.name === elem.name).length > 0) {
-            play(playlistUrl, item);
+            play(props, item);
         }
         selectOneItem(item, setSelected);
     }
@@ -107,9 +111,9 @@ export default function Playlist(props) {
     const [playlist, setPlaylist] = useState([]);
     const [current, setCurrent] = useState({});
     
-    useEffect(() => updatePlaylist(props.url, setPlaylist, setCurrent), [props.url]);
+    useEffect(() => updatePlaylist(props, setPlaylist, setCurrent), [props.url]);
     
-    useSocket('current-playlist', () => updateCurrent(props.url, setCurrent));
+    useSocket('current-playlist', () => updateCurrent(props, setCurrent));
     
     const cards = playlist.map(item => {
         let imgUrl = encodeURI(url.resolve(`http://${props.url}`, `/medias/${item.name}?thumb=true`).trim());
@@ -119,11 +123,11 @@ export default function Playlist(props) {
             image={imgUrl}
             current={current.name == item.name}
             selected={selected.filter(elem => item.name === elem.name).length > 0}
-            onPlay={() => play(props.url, item)}
-            onClick={(event) => handleClick(props.url, item, selected, setSelected, event)}
+            onPlay={() => play(props, item)}
+            onClick={(event) => handleClick(props, item, selected, setSelected, event)}
             onCheckboxChange={() => handleCheckboxChange(item, selected, setSelected)}
-            onRemove={() => remove(props.url, item, setPlaylist, setCurrent)}
-            onSwitchChange={() => setActive(props.url, item, setPlaylist, setCurrent)}
+            onRemove={() => remove(props, item, setPlaylist, setCurrent)}
+            onSwitchChange={() => setActive(props, item, setPlaylist, setCurrent)}
         />
     })
 
@@ -135,5 +139,12 @@ export default function Playlist(props) {
 }
 
 Playlist.propTypes = {
-    url: PropTypes.string.isRequired
+    url: PropTypes.string.isRequired,
+    onTaskStart: PropTypes.func,
+    onTaskEnd: PropTypes.func,
+}
+
+Playlist.defaultProps = {
+    onTaskStart: () => {},
+    onTaskEnd: () => {},
 }
