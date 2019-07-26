@@ -6,6 +6,7 @@
     height: 32px;
     vertical-align: middle;
     background-color: var(--theme-primary);
+    border-color: var(--theme-primary);
     color: var(--theme-text-on-primary);
     justify-content: center;
     align-items: center;
