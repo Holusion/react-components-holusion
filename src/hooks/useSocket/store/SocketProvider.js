@@ -15,7 +15,7 @@ export default function SocketProvider(props) {
 
 SocketProvider.propTypes = {
     url: PropTypes.string,
-    children: PropTypes.oneOfType(PropTypes.arrayOf(PropTypes.element), PropTypes.element)
+    children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.element), PropTypes.element])
 }
 
 

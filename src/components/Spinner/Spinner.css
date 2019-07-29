@@ -7,7 +7,12 @@
 }
 
 .spinner {
+    display: block;
     z-index: 100;
+    width: 40px;
+    padding-left: 20px;
+    box-sizing: border-box;
+    margin: auto; /* auto-center if necessary*/
 }
 
 .spinner.absolute {
