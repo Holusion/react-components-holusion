@@ -1,7 +1,7 @@
 @import url('../../variables.css');
 
 .fab-container {
-    position: fixed;
+    position:absolute;
     right: 16px;
     bottom: 16px;
     padding: 14px 16px;
@@ -13,7 +13,9 @@
     box-shadow: 0px 6px 6px rgba(0,0,0,0.2);
     transition: all 0.3s ease-in-out;
 }
-
+.fab-container.fixed {
+    position: fixed;
+}
 .fab-container::after {
     content: '';
     display: block;

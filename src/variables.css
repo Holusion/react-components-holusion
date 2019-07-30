@@ -6,3 +6,10 @@
 
     --top-app-bar-height: 56px;
 }
+
+.color-primary{
+    color: var(--theme-primary);
+}
+.color-secondary{
+    color: var(--theme-secondary);
+}

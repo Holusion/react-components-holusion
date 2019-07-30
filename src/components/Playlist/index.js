@@ -147,7 +147,7 @@ export default function Playlist(props) {
     const uploads = acceptedFiles.map((file, index)=>{
         return (<Uploader file={file} url={url.resolve(`http://${props.url}`, "/medias")} key={file.path}/>);
     })
-    const cards = playlist.map(item => {
+    let cards = playlist.map(item => {
         let imgUrl = encodeURI(url.resolve(`http://${props.url}`, `/medias/${item.name}?thumb=true`).trim());
         return <PlaylistItem 
             key={item.name} 
@@ -163,12 +163,19 @@ export default function Playlist(props) {
             onSwitchChange={() => setActive(props, item, setPlaylist, setCurrent)}
         />
     })
+    if(cards.length == 0){
+        cards= (<div>
+            <h3 className="color-primary">No medias on device</h3>
+            <p>Drag &amp; drop a compatible file or click the upload button to begin using your device</p>
+            <p>The upload button is the blue box with this icon <Icon name="upload"/> in the bottom right corner of your screen</p>
+        </div>)
+    }
     return (
         <div {...getRootProps({ className:`playlist-container${isDragActive?" drag":""}`, onClick:(e)=>{e.target.classList.contains("fab-container") || e.stopPropagation()}})}>
             <input {...getInputProps()} />
-            <Fab title="Ajouter un media" icon="upload" onClick={(e)=>open(e)}/>
-            {uploads}
             {cards}
+            {uploads}
+            <Fab title="Ajouter un media" icon="upload" onClick={(e)=>open(e)}/>
         </div>
     )
 }

@@ -1,5 +1,6 @@
 
-// import 'normalize.css';
+import 'normalize.css';
+import "./variables.css";
 export {default as Button} from './components/Button'
 export {default as ButtonIcon} from './components/ButtonIcon'
 export {default as Card} from './components/Card'
