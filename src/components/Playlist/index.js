@@ -2,9 +2,14 @@
 import "./Playlist.css"
 import PlaylistItem from "../PlaylistItem";
 import PropTypes from 'prop-types'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import {useSocket} from '../../hooks/useSocket';
 import url from 'url'
+
+import {useDropzone} from 'react-dropzone'
+import Card from "../Card";
+import Icon from "../Icon";
+import Uploader from "../Upload/Uploader"
 
 function play(props, item) {
     props.onTaskStart(`play-${item.name}`)
@@ -119,11 +124,16 @@ function handleCheckboxChange(item, selected, setSelected) {
     isSelected ? unselectItem(item, selected, setSelected) : select(item, selected, setSelected);
 }
 
+
+
+
+
+
 export default function Playlist(props) {
     const [selected, setSelected] = useState([]);
     const [playlist, setPlaylist] = useState([]);
     const [current, setCurrent] = useState({});
-    
+    const [isDrag, setDrag] = useState(false);
     useEffect(() => updatePlaylist(props, setPlaylist, setCurrent), [props.url]);
     
     useSocket('current', () => updateCurrent(props, setCurrent));
@@ -131,7 +141,11 @@ export default function Playlist(props) {
     useSocket('remove', () => setTimeout(() => {
         updatePlaylist(props, setPlaylist, setCurrent);
     }, 1000));
-    
+    const {acceptedFiles, getRootProps, getInputProps, isDragActive} = useDropzone();
+    const uploads = acceptedFiles.map((file, index)=>{
+        return (<Uploader file={file} url={url.resolve(`http://${props.url}`, "/medias")} key={file.path}/>);
+    })
+
     const cards = playlist.map(item => {
         let imgUrl = encodeURI(url.resolve(`http://${props.url}`, `/medias/${item.name}?thumb=true`).trim());
         return <PlaylistItem 
@@ -148,9 +162,15 @@ export default function Playlist(props) {
             onSwitchChange={() => setActive(props, item, setPlaylist, setCurrent)}
         />
     })
-
+    /*
+<div {...getRootProps({ onClick: event => console.log("root click", event)})}>
+                <Card ><Icon name="play"/></Card>
+                <input {...getInputProps()} />
+            </div>
+    //*/
     return (
-        <div className="playlist-container">
+        <div {...getRootProps({ onClick: event => console.log("root click", event), className:`playlist-container${isDragActive?" drag":""}`})}>
+            {uploads}
             {cards}
         </div>
     )

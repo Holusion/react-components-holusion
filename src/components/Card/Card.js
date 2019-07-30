@@ -11,7 +11,7 @@ export default function Card(props) {
                     {props.top}
                 </div>
                 <div className="card-primary">
-                    {props.primary}
+                    {props.children ||props.primary}
                 </div>
                 <div className="card-bottom">
                     {props.bottom}
