@@ -98,7 +98,7 @@ function updatePlaylist(props, setPlaylist, setCurrent) {
     fetch(url.resolve(`http://${props.url}`, `/playlist`)).then(res => {
         if(res && res.ok) {
             res.json().then(playlist => {
-                setPlaylist(playlist);
+                setPlaylist(playlist.filter(props.filterBy));
                 updateCurrent(props, setCurrent);
             })   
         } else if(res.status == 204) {
@@ -184,6 +184,7 @@ export default function Playlist(props) {
 
 Playlist.propTypes = {
     url: PropTypes.string.isRequired,
+    filterBy: PropTypes.func,
     onTaskStart: PropTypes.func,
     onTaskEnd: PropTypes.func,
     onSelectionChange: PropTypes.func,
@@ -193,4 +194,5 @@ Playlist.defaultProps = {
     onTaskStart: () => {},
     onTaskEnd: () => {},
     onSelectionChange: () => {},
+    filterBy: () => true,
 }
