@@ -98,7 +98,7 @@ function updatePlaylist(props, setPlaylist, setCurrent) {
     fetch(url.resolve(`http://${props.url}`, `/playlist`)).then(res => {
         if(res && res.ok) {
             res.json().then(playlist => {
-                setPlaylist(playlist.filter(props.filterBy));
+                setPlaylist(playlist);
                 updateCurrent(props, setCurrent);
             })   
         } else if(res.status == 204) {
@@ -149,7 +149,7 @@ export default function Playlist(props) {
     const uploads = acceptedFiles.map((file, index)=>{
         return (<Uploader file={file} url={url.resolve(`http://${props.url}`, "/medias")} key={file.path}/>);
     })
-    let cards = playlist.map(item => {
+    let cards = playlist.filter((elem) => props.filterBy(elem)).map(item => {
         let imgUrl = encodeURI(url.resolve(`http://${props.url}`, `/medias/${item.name}?thumb=true`).trim());
         return <PlaylistItem 
             key={item.name} 
