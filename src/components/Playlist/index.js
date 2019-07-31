@@ -135,6 +135,7 @@ export default function Playlist(props) {
     const [current, setCurrent] = useState({});
     const [isDrag, setDrag] = useState(false);
     useEffect(() => updatePlaylist(props, setPlaylist, setCurrent), [props.url]);
+    useEffect(() => props.onSelectionChange(selected), [selected]);
     
     useSocket('current', () => updateCurrent(props, setCurrent));
     useSocket('insert', () => updatePlaylist(props, setPlaylist, setCurrent));
@@ -184,9 +185,11 @@ Playlist.propTypes = {
     url: PropTypes.string.isRequired,
     onTaskStart: PropTypes.func,
     onTaskEnd: PropTypes.func,
+    onSelectionChange: PropTypes.func,
 }
 
 Playlist.defaultProps = {
     onTaskStart: () => {},
     onTaskEnd: () => {},
+    onSelectionChange: () => {},
 }
