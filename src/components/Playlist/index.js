@@ -53,7 +53,7 @@ function remove(props, item) {
     })
 }
 
-function setActive(props, item, setPlaylist, setCurrent) {
+function setActive(props, item) {
     props.onTaskStart(`active-${item.name}`);
     let options = {
         method: 'PUT',
@@ -63,7 +63,6 @@ function setActive(props, item, setPlaylist, setCurrent) {
         },
     }
     fetch(url.resolve(`http://${props.url}`, `/playlist`), options).then(res => {
-        updatePlaylist(props, setPlaylist, setCurrent)
         if(!res.ok) {
             const err = new Error(`${res.status} - ${res.statusText}`);
             props.onTaskEnd(`active-${item.name}`, err);            
@@ -142,6 +141,8 @@ export default function Playlist(props) {
     useSocket('remove', () => setTimeout(() => {
         updatePlaylist(props, setPlaylist, setCurrent);
     }, 1000));
+    useSocket('update', () => updatePlaylist(props, setPlaylist, setCurrent));
+
     const {acceptedFiles, getRootProps, getInputProps, isDragActive, open} = useDropzone({
         noKeyboard: true
     });
