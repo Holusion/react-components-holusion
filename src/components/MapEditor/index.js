@@ -45,7 +45,6 @@ function AddMapLine(props){
 
 export default function MapEditor(props){
   const [items, setItems] = useState(props.items);
-  console.log("render MapEditor")
   const children = [];
 
   for (const [key, value] of items){

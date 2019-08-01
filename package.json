@@ -5,7 +5,7 @@
   "description": "",
   "scripts": {
     "watch": "webpack --watch --mode=development",
-    "build": "webpack  --mode=production",
+    "build": "webpack  --mode=production --devtool=source-map",
     "prepare": "npm run build",
     "test": "jest"
   },
@@ -41,7 +41,8 @@
   },
   "files": [
     "dist/index.js",
-    "dist/public/**/*"
+    "dist/public/**/*",
+    "src"
   ],
   "jest": {
     "moduleNameMapper": {

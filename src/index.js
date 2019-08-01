@@ -1,6 +1,5 @@
 
 import 'normalize.css';
-import "./variables.css";
 export {default as Button} from './components/Button'
 export {default as ButtonIcon} from './components/ButtonIcon'
 export {default as Card} from './components/Card'
@@ -17,5 +16,5 @@ export {default as Topbar} from './components/Topbar'
 export {default as Config} from './components/Config'
 export {default as MapEditor} from './components/MapEditor'
 export {default as Radio} from './components/Radio'
-export {default as uploader} from './components/Upload' 
+export {default as uploader} from './components/Upload'
 export {SocketProvider, useSocket} from './hooks/useSocket';

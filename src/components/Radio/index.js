@@ -20,7 +20,6 @@ RadioButton.propTypes = {
 export default function Radio(props){
   const [selectedValue, setSelected] = useState(props.checked);
   const selectedIndex = (typeof selectedValue !== "undefined")? props.items.findIndex(({value}) => value.toString() === selectedValue.toString()) : 0;
-  console.log("render radio, selected : ", selectedValue, selectedIndex, props.items);
   const children = props.items.map(({label, value}, idx) => {
     return (<RadioButton label={label}  value={value} checked={idx == selectedIndex} key={idx} onChange={e=> {
       setSelected(e.target.value);
