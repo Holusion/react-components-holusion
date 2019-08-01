@@ -27,7 +27,6 @@ export default function Config(props){
     }
   }
 
-  console.log("Shortcuts : ", opts.shortcuts);
   return (
     <div className="product-configuration" >
       <label>Play content in loop or stop after each item?</label>
