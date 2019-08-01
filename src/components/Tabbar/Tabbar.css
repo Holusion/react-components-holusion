@@ -1,0 +1,22 @@
+@import url('../../variables.css');
+
+.tabbar-container {
+    position: relative;
+    box-sizing: content-box;
+}
+
+.tabbar-content {
+    width: 360px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+}
+
+.tabbar-slider {
+    position: absolute;
+    border-bottom: solid 2px var(--theme-primary);
+    bottom: 0;
+    left: 50%;
+    transition: transform 0.3s ease-in-out; 
+}
