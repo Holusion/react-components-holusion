@@ -10,7 +10,9 @@ import {useDropzone} from 'react-dropzone'
 import Card from "../Card";
 import Icon from "../Icon";
 import Uploader from "../Upload/Uploader";
+import Spinner from "../Spinner";
 import Fab from "../Fab";
+
 function play(props, item) {
     props.onTaskStart(`play-${item.name}`)
     let options = {
@@ -129,6 +131,9 @@ function handleCheckboxChange(item, selected, setSelected) {
 
 
 export default function Playlist(props) {
+    // Default to connected in the beginning because we don't know socket's state
+    //And it's probably true...
+    const [connected, setConnected] = useState(true);
     const [selected, setSelected] = useState([]);
     const [playlist, setPlaylist] = useState([]);
     const [current, setCurrent] = useState({});
@@ -136,6 +141,18 @@ export default function Playlist(props) {
     useEffect(() => updatePlaylist(props, setPlaylist, setCurrent), [props.url]);
     useEffect(() => props.onSelectionChange(selected), [selected]);
     
+    useSocket('disconnect', ()=>{
+        console.log("disconnect")
+        setConnected(false);
+    })
+    useSocket('connect', ()=>{
+        console.log("connect")
+        setConnected(true);
+    });
+    useSocket('error', (e)=>{
+        console.error("Socket error : ", e);
+    })
+
     useSocket('current', () => updateCurrent(props, setCurrent));
     useSocket('insert', () => updatePlaylist(props, setPlaylist, setCurrent));
     useSocket('remove', () => setTimeout(() => {
@@ -173,8 +190,10 @@ export default function Playlist(props) {
         </div>)
     }
     return (
+        
         <div {...getRootProps({ className:`playlist-container${isDragActive?" drag":""}`, onClick:(e)=>{e.target.classList.contains("fab-container") || e.stopPropagation()}})}>
             <input {...getInputProps()} />
+            <Spinner active={!connected} style={{position:"absolute",top:0, right:0, color:"var(--theme-primary)"}} title="Connection lost..."></Spinner>
             {cards}
             {uploads}
             <Fab title="Ajouter un media" icon="upload" onClick={(e)=>open(e)}/>
