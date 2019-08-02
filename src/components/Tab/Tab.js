@@ -12,6 +12,5 @@ export default function Tab(props) {
 
 Tab.propTypes = {
     text: PropTypes.string,
-    selected: PropTypes.bool,
-    onClick: PropTypes.func,
+    selected: PropTypes.bool
 }
