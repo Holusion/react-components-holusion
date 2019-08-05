@@ -34,16 +34,10 @@
     flex-grow:1;
 }
 
-.playlist-container .disconnected-overlay{
-    position: absolute;
-    top:0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    cursor: pointer;
-    background: rgba(0, 0, 0, 0.2);
+.playlist-container.disconnected .playlist-content{
+    pointer-events: none;
+    opacity:0.4;
 }
-
 .playlist-container .playlist-drawer{
     position: sticky;
     right:0;

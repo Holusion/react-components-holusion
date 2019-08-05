@@ -223,7 +223,7 @@ export default function Playlist(props) {
             onSwitchChange={() => setActive(props, item, setPlaylist, setCurrent)}
         />
     })
-    if(cards.length == 0){
+    if(cards.length == 0 && uploads.length == 0){
         cards= (<div>
             <h3 className="color-primary">No medias on device</h3>
             <p>Drag &amp; drop a compatible file or click the upload button to begin using your device</p>
@@ -239,9 +239,12 @@ export default function Playlist(props) {
             {uploads}
         </div>)
     }
+    let classes = "playlist-container"
+    if(isDragActive) classes += ` drag`;
+    if(!connected) classes += ` disconnected`;
     return (
         
-        <div {...getRootProps({ className:`playlist-container${isDragActive?" drag":""}`, onClick:(e)=>{e.target.classList.contains("fab-container") || e.stopPropagation()}})}>
+        <div {...getRootProps({ className:classes, onClick:(e)=>{e.target.classList.contains("fab-container") || e.stopPropagation()}})}>
             <input {...getInputProps()} />
             {content}
             <div className="playlist-drawer">

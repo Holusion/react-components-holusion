@@ -2,7 +2,7 @@ import "./Spinner.css"
 import PropTypes from 'prop-types'
 import React from 'react'
 
-export default function Spinner({active, className, size={}, style=40, ...props}) {
+export default function Spinner({active, className, size=40, style={}, ...props}) {
     return (
         <div 
             className={`spinner ${className||""}${active !== false ? " active" : ""}`} 
@@ -18,5 +18,5 @@ export default function Spinner({active, className, size={}, style=40, ...props}
 Spinner.propTypes = {
     active: PropTypes.bool,
     absolute: PropTypes.bool,
-    size: PropTypes.integer
+    size: PropTypes.number
 }
