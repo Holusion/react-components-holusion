@@ -15,14 +15,13 @@ export default function Uploader(props){
     fetch(props.url, {method:"POST", body:form}).then(async r =>{
       const newData = await r.json();
       if(!r.ok){
-        setError(newData);
+        setError({code:r.status, message: r.statusText});
       }else{
-        setData(newData);
+        setData();
       }
       setLoading(false);
     });
   }, []);
-  let content;
   if(isLoading){
     return (
       <Card>
@@ -33,7 +32,7 @@ export default function Uploader(props){
     return (<Card>
       <h2>There was an error</h2>
       <div>Trying to upload, encountered error : </div>
-      <div>{error.message.errorType}</div>
+      <div>{error.message}</div>
     </Card>)
   }else{
     return null;

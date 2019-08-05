@@ -27,6 +27,13 @@
     text-align: center;
     border: 3px dashed var(--theme-primary);
 }
+
+.playlist-container .playlist-content {
+    display: flex;
+    flex-wrap: wrap;
+    flex-grow:1;
+}
+
 .playlist-container .disconnected-overlay{
     position: absolute;
     top:0;
@@ -35,4 +42,43 @@
     right: 0;
     cursor: pointer;
     background: rgba(0, 0, 0, 0.2);
+}
+
+.playlist-container .playlist-drawer{
+    position: sticky;
+    right:0;
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+}
+.playlist-container .playlist-drawer a>svg{
+    border: 1px solid currentColor;
+    background: white;
+    border-radius: 4px;
+    padding: 4px;
+}
+.playlist-container svg path:not([fill]){
+    fill: currentColor;
+}
+.playlist-container .playlist-drawer>a>svg:hover{
+    filter:invert(10%);
+    cursor: pointer;
+}
+.playlist-container .playlist-drawer input{
+    position:absolute;
+
+}
+.playlist-container .folded-drawer-item{
+    display:flex;
+    position: relative;
+    width:34px;
+    flex-direction: column-reverse;
+}
+
+.playlist-container .folded-drawer-item:not(.active) .fold.d-unfolded{
+    display: none;
+}
+
+.playlist-container .folded-drawer-item.active .fold.d-folded {
+    display: none;
 }

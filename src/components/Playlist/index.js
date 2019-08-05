@@ -2,17 +2,21 @@
 import "./Playlist.css"
 import PlaylistItem from "../PlaylistItem";
 import PropTypes from 'prop-types'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, createRef, useCallback } from 'react'
 import {useSocket} from '../../hooks/useSocket';
 import url from 'url'
 
-import {useDropzone} from 'react-dropzone'
-import Card from "../Card";
-import Icon from "../Icon";
+import {useDropzone} from 'react-dropzone';
 import Uploader from "../Upload/Uploader";
 import Spinner from "../Spinner";
 import Fab from "../Fab";
 
+
+import LinkIcon from "../../icons/baseline-link-24px.svg";
+import UploadIcon from "../../icons/upload.svg";
+import CheckIcon from "../../icons/check.svg";
+import CloseIcon from "../../icons/close.svg";
+import RefreshIcon from "../../icons/refresh.svg";
 function play(props, item) {
     props.onTaskStart(`play-${item.name}`)
     let options = {
@@ -42,7 +46,7 @@ function remove(props, item) {
             'Content-Type': 'application/json'
         },
     }
-    fetch(url.resolve(`http://${props.url}`, `/medias/${item.name}`), options).then(res => {    
+    fetch(url.resolve(`http://${props.url}`, `/medias/${encodeURIComponent(item.name)}`), options).then(res => {    
         if(!res.ok) {
             const err = new Error(`${res.status} - ${res.statusText}`);
             props.onTaskEnd(`remove-${item.name}`, err);    
@@ -127,8 +131,51 @@ function handleCheckboxChange(item, selected, setSelected) {
 
 
 
+function SendLink({uri, ...props}){
+    const [state, setState] = useState({value:"", status: "ready"});
+    const ref = createRef();
+    function handleClick(e){
+        setState({value: state.value, status: "loading"});
+        fetch(url.resolve(uri,"/medias"), {method:"POST",headers:{"Content-Type":"application/json"}, body: JSON.stringify({uri:state.value})}).then(async r =>{
+            const newData = await r.json();
+            //console.log("set state : ", newData, "for component", props.component.name);
+            if(!r.ok){
+                console.log("Error :",r.message, "for SendLink");
+                setState({value: state.value, status: "error"});
+            }else{
+                setState({value: "", status: "ready"});
+            }
+        }, (e)=>{
+            console.log("caught error", e, " for SendLink");
+            setState({value: state.value, status: "error"});
+        })
+    };
+    function handleChange(e){
+        setState({value:e.target.value, status: "ready"})
+    }
+    let icn;
+    switch(state.status){
+        case "ready":
+            icn = (<CheckIcon/>);
+            break;
+        case "loading":
+            icn = (<RefreshIcon/>);
+            break;
+        case "error":
+        default:
+            icn = (<RefreshIcon/>);
+            break;
+    }
 
+    return (<span {...props}>
+        <a onClick={handleClick} style={{color:"green"}} title="send link">{icn}</a>
+        <input  type="text" placeholder="https://example.com" value={state.value} onChange={handleChange}/>
+    </span>)
+}
 
+SendLink.propTypes = {
+    uri: PropTypes.string.isRequired
+}
 
 export default function Playlist(props) {
     // Default to connected in the beginning because we don't know socket's state
@@ -141,15 +188,9 @@ export default function Playlist(props) {
     useEffect(() => updatePlaylist(props, setPlaylist, setCurrent), [props.url]);
     useEffect(() => props.onSelectionChange(selected), [selected]);
     
-    useSocket('disconnect', ()=>{
-        console.log("disconnect")
-        setConnected(false);
-    })
-    useSocket('connect', ()=>{
-        console.log("connect")
-        setConnected(true);
-    });
-    useSocket('error', (e)=>{
+    useSocket('disconnect', () => setConnected(false) );
+    useSocket('connect', () => setConnected(true) );
+    useSocket('error', (e) => {
         console.error("Socket error : ", e);
     })
 
@@ -186,17 +227,32 @@ export default function Playlist(props) {
         cards= (<div>
             <h3 className="color-primary">No medias on device</h3>
             <p>Drag &amp; drop a compatible file or click the upload button to begin using your device</p>
-            <p>The upload button is the blue box with this icon <Icon name="upload"/> in the bottom right corner of your screen</p>
+            <p>The upload button is the blue box with this icon <UploadIcon/> in the top right corner of your screen</p>
+        </div>)
+    }
+    let content;
+    if(!connected && cards.length == 0){
+        content = (<Spinner active />)
+    }else{
+        content = (<div className="playlist-content">
+            {cards}
+            {uploads}
         </div>)
     }
     return (
         
         <div {...getRootProps({ className:`playlist-container${isDragActive?" drag":""}`, onClick:(e)=>{e.target.classList.contains("fab-container") || e.stopPropagation()}})}>
             <input {...getInputProps()} />
-            <Spinner active={!connected} style={{position:"absolute",top:0, right:0, color:"var(--theme-primary)"}} title="Connection lost..."></Spinner>
-            {cards}
-            {uploads}
-            <Fab title="Ajouter un media" icon="upload" onClick={(e)=>open(e)}/>
+            {content}
+            <div className="playlist-drawer">
+                <a onClick={(e)=>open(e)} title="Upload a new media"><UploadIcon/></a>
+                <span className="folded-drawer-item" >
+                    <a className="fold d-folded" onClick={(e)=>e.currentTarget.parentNode.classList.add("active")} title="Add a new link"><LinkIcon/></a>
+                    <a className="fold d-unfolded" onClick={(e)=>e.currentTarget.parentNode.classList.remove("active")} title="fold"><CloseIcon/></a>
+                    <SendLink className="fold d-unfolded" style={{position:"absolute", top: 0, left: "-300px"}} uri={`http://${props.url}`}/>                    
+                </span>
+                <Spinner active={!connected} style={{color:"var(--theme-primary)", margin: 0}} size={34} title="Connection lost..."></Spinner>
+            </div>
         </div>
     )
 }
