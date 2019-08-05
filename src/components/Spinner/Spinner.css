@@ -9,10 +9,9 @@
 .spinner {
     display: block;
     z-index: 100;
-    width: 40px;
-    padding-left: 20px;
     box-sizing: border-box;
     margin: auto; /* auto-center if necessary*/
+    overflow: hidden;
 }
 
 .spinner.absolute {
@@ -43,18 +42,14 @@
     width: 0;
     height: 0;
     margin-left: 0px;
-    border-radius: 0px;
+    border-radius: 50%;
     box-sizing: border-box;
     border: 0px solid currentColor;
     border-right-color: transparent;
-    transition:  0.5s ease-in-out;
+    transition:  0.3s ease-in-out;
 }
 
 .spinner.active .spinner-content {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    margin-left: -20px;
     border-width: 5px;
     animation: spin 1s infinite linear;
 }
