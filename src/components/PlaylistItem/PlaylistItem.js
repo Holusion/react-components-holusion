@@ -51,7 +51,7 @@ function createBottom(props) {
 export default function PlaylistItem(props) {
     return (
         <div className={`playlist-item ${props.selected ? "selected" : ""} ${props.item.active ? "active" : ""} ${props.visible ? "visible" : ""}`} onClick={props.onClick} title={props.item.name}>
-            <Card top={createTop(props)} primary={createPrimary(props)} bottom={createBottom(props)} image={props.image} />
+            <Card top={createTop(props)}  title={createBottom(props)} image={props.image} >{createPrimary(props)}</Card>
         </div>
     )
 }

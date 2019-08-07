@@ -2,20 +2,24 @@ import './Card.css'
 import PropTypes from 'prop-types'
 import React from 'react'
 
-export default function Card(props) {
+export default function Card({title, children, top, size=200, image, style={}, ...props}) {
+
+    const backGroundStyle = (image)? {backgroundImage: `url(${image})`} : {background: "var(--theme-primary)"};
     return (
-        <div className="card">
-            <div className="card-background-image" style={{backgroundImage: `url(${props.image})`}}></div>
-            <div className="card-content">
+        <div className="card" style={Object.assign(style, {width:size, height:size})} {...props}>
+
+            
+            <div className="card-content" style={backGroundStyle}>
                 <div className="card-top">
-                    {props.top}
+                    {top}
                 </div>
                 <div className="card-primary">
-                    {props.children ||props.primary}
+                    {children}
                 </div>
-                <div className="card-bottom">
-                    {props.bottom}
-                </div>
+            </div>
+            
+            <div className="card-bottom">
+                {title}
             </div>
         </div>
     )
@@ -23,7 +27,8 @@ export default function Card(props) {
 
 Card.propTypes = {
     top: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
-    primary: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
-    bottom: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
-    image: PropTypes.string
+    children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
+    title: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
+    image: PropTypes.string,
+    size: PropTypes.number
 }

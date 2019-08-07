@@ -12,8 +12,11 @@
     box-sizing: border-box;
     margin: auto; /* auto-center if necessary*/
     overflow: hidden;
+    position:relative;
 }
-
+.spinner:not(.active){
+    display:none;
+}
 .spinner.absolute {
     position: fixed;
 }
@@ -24,8 +27,14 @@
     left: 50%;
 }
 
-.spinner span {
-    display: none;
+.spinner .progress-report {
+    position:absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    text-align: center;
+    vertical-align: middle;
 }
 
 .spinner.absolute.active {

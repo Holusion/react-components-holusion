@@ -17,6 +17,8 @@ import UploadIcon from "../../icons/upload.svg";
 import CheckIcon from "../../icons/check.svg";
 import CloseIcon from "../../icons/close.svg";
 import RefreshIcon from "../../icons/refresh.svg";
+import PoweroffIcon from "../../icons/baseline-power_off-24px.svg";
+
 function play(props, item) {
     props.onTaskStart(`play-${item.name}`)
     let options = {
@@ -254,7 +256,9 @@ export default function Playlist(props) {
                     <a className="fold d-unfolded" onClick={(e)=>e.currentTarget.parentNode.classList.remove("active")} title="fold"><CloseIcon/></a>
                     <SendLink className="fold d-unfolded" style={{position:"absolute", top: 0, left: "-300px"}} uri={`http://${props.url}`}/>                    
                 </span>
-                <Spinner active={!connected} style={{color:"var(--theme-primary)", margin: 0}} size={34} title="Connection lost..."></Spinner>
+                <Spinner active={!connected} style={{color:"var(--theme-primary)", margin: 0}} size={34} title="Connection lost...">
+                    <PoweroffIcon  style={{opacity:0.4, padding:"5px"}}/>
+                    </Spinner>
             </div>
         </div>
     )

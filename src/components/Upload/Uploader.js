@@ -5,37 +5,61 @@ import PropTypes from 'prop-types'
 import Spinner from "../Spinner";
 import Card from "../Card";
 
+import ErrorIcon from "../../icons/baseline-error_outline-24px.svg";
+
 export default function Uploader(props){
-  const [data, setData] = useState([]);
   const [error, setError] = useState(null);
-  const [isLoading, setLoading] = useState(true);
+  const [progress, setProgress] = useState(-1);
   useEffect(()=>{
+    console.log("Upload File :", props.file);
     const form = new FormData();
-    form.append('file', props.file);
-    fetch(props.url, {method:"POST", body:form}).then(async r =>{
-      const newData = await r.json();
-      if(!r.ok){
-        setError({code:r.status, message: r.statusText});
+    form.append("file", props.file);
+    let xhr = new XMLHttpRequest();
+    xhr.onload = function onUploadDone(){
+      if(xhr.status != 200){
+        setError({code:xhr.status, message: xhr.statusText});
       }else{
-        setData();
+        setProgress("done");
       }
-      setLoading(false);
-    });
+    }
+
+    xhr.upload.onprogress = function onUploadProgress(evt){
+      if(evt.lengthComputable){
+        console.log("Progress : ", Math.floor(evt.loaded/evt.total*100));
+        setProgress(Math.floor(evt.loaded/evt.total*100));
+      }else{
+        setProgress("unknown");
+      }
+    }
+    xhr.onerror = function onUploadError(){
+      setError({code: xhr.status, message: xhr.statusText});
+    }
+
+    xhr.open('POST', props.url);
+    xhr.send(form);
+
+    return ()=>{
+      xhr.abort();
+    }
   }, []);
-  if(isLoading){
+
+  if(progress == "done"){
+    return null;
+  }else if (!error){
+    let text = (progress < 0)? "":  `${progress}%`;
+    let title = (<div className="playlist-item-bottom"><div className="playlist-item-title"><span>{props.file.name}</span></div></div>)
     return (
-      <Card>
-        <div style={{margin:"auto", color:"var(--theme-secondary"}}><Spinner active/></div>
+      <Card title={title} top={(<div style={{color:"white", padding:"4px", fontWeight:"bold"}}>Upload</div>)}>
+        <div style={{margin:"auto", color:"var(--theme-secondary", flexGrow:1}}><Spinner  size={80} active>{text}</Spinner></div>
       </Card>
       )
-  }else if(error){
-    return (<Card>
-      <h2>There was an error</h2>
-      <div>Trying to upload, encountered error : </div>
-      <div>{error.message}</div>
-    </Card>)
   }else{
-    return null;
+    return (<Card top="Upload error" title={error.message}>
+      <div style={{display:"flex",flexDirection:"column", justifyContent:"stretch"}}>
+        <ErrorIcon/>
+        failed to upload, encountered error : 
+      </div>
+    </Card>)
   }
 }
 

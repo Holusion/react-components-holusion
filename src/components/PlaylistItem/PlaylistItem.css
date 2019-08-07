@@ -29,7 +29,6 @@
   display: flex;
   color: white;
   margin: 0;
-  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -77,23 +76,16 @@
 }
 
 .playlist-item-top {
-  position: absolute;
-  top: 0;
+  flex-grow: 1;
   padding: 2px;
-  width: 100%;
   height: 30px;
+  display: flex;
+  justify-content: space-between;
 }
 
-.playlist-item-top-middle {
-  position: absolute;
-  left: calc(50% - 18px);
-  top: 4px;
-}
 
 .playlist-item-top-right {
-  position: absolute;
-  right: 2px;
-  top: 0;
+  border-top-right-radius: 4px;
 }
 
 .playlist-item-remove {

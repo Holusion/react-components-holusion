@@ -1,6 +1,6 @@
 @import url('../../variables.css');
 
-.card{
+.card {
     display: flex;
     -webkit-box-orient: vertical;
     -webkit-box-direction: normal;
@@ -11,28 +11,36 @@
     box-sizing: border-box;
     padding: 0px;
     overflow: hidden;
-    position: relative;
     user-select: none;
     border-radius: 4px;
-    width:200px;
-    height:200px;
     margin:1px;
     white-space: nowrap;
-    background-color: rgba(0,0,0,0.4);
+    background-color: var(--theme-primary);
     background-size: 100%;
 }
 
 .card-top {
     display: flex;
+    z-index: 1;
 }
 
-.card-background-image {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
+.card-content{
+    flex-grow: 1;
+    position: relative;
+}
+
+.card .card-content {
+    z-index: 0;
     background-repeat: no-repeat;
     background-size: 100%;
+    background-size: cover;
+    background-position: center;
+}
+
+.card .card-bottom {
+    color: white;
+    margin: 0;
+    height: 48px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
