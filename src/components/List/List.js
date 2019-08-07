@@ -1,41 +1,31 @@
 'use strict'
 import "./List.css"
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, {useState} from 'react'
 
-export default class List extends React.Component {
+function handleClick(e, index, setSelected) {
+    e.preventDefault();
+    setSelected(index);
+}
 
-    constructor(props) {
-        super(props);
+export default function List(props) {
+    const [selected, setSelected] = useState(-1);
 
-        this.state = {
-            selectedIndex: -1
-        }
-    }
+    const listItem = React.Children.toArray(props.children);
+    // Children is immutable so we have to clone children to handle selected items
+    const mapList = listItem.map((child, i) => {
+        return React.cloneElement(child, {selected: i == selected, onClick: (ev) => {
+            handleClick(ev, i, setSelected);
+            if(child.props.onClick) child.props.onClick();
+        }})
+    })
+    
+    return (
+        <ul className="list">
+            {mapList}
+        </ul>
+    )
 
-    handleClick(e, index) {
-        e.preventDefault();
-        if(this) {
-            this.setState(() => ({selectedIndex: index}));
-        }
-    }
-
-    render() {
-        const listItem = React.Children.toArray(this.props.children);
-        // Children is immutable so we have to clone children to handle selected items
-        const mapList = listItem.map((child, i) => {
-            return React.cloneElement(child, {selected: i == this.state.selectedIndex, onClick: (ev) => {
-                this.handleClick(ev, i);
-                if(child.props.onClick) child.props.onClick();
-            }})
-        })
-
-        return (
-            <ul className="list">
-                {mapList}
-            </ul>
-        )
-    }
 }
 
 List.propTypes = {
