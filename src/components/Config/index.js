@@ -2,11 +2,17 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import Spinner from "../Spinner";
 import Radio from '../Radio';
 import MapEditor from '../MapEditor';
 
+import ScreenLayout from "./ScreenLayout";
+
+import {useSocket, useSocketState} from '../../hooks/useSocket';
+
 export default function Config(props){
-  const opts = props.items.reduce((res, {key, value}) =>{
+  const items = useSocket("update", props.items);
+  const opts =  items.reduce((res, {key, value}) =>{
     res[key] = value;
     return res;
   }, {});
@@ -26,17 +32,17 @@ export default function Config(props){
       return console.error("Failed to save config : ", r.status, body);
     }
   }
-
+  
   return (
     <div className="product-configuration" >
       <label>Play content in loop or stop after each item?</label>
       <Radio className="row" items={[{label:"loop", value:true}, {label:"don't loop", value: false}]} checked={opts.loop} onChange={val=>handleChange("loop", val == 'true')}/> 
       <label>Raccourcis clavier</label>
       <MapEditor items={opts.shortcuts} onChange={handleChange.bind(null,"shortcuts")}/>
+      <ScreenLayout conf={opts.screens} />
     </div>
   )
 }
 
 Config.propTypes = {
-  items: PropTypes.arrayOf(PropTypes.object).isRequired
 }

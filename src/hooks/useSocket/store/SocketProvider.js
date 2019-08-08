@@ -7,12 +7,12 @@ export default function SocketProvider(props) {
     const [socket, setSocket] = useState();
 
     useEffect(()=>{
-        const socket = io(props.url);
-        setSocket(socket);
+        const s = io(props.url);
+        setSocket(s);
         return ()=>{
-            socket.close();
+            s.close();
         }
-    },[]);
+    }, [props.url]);
 
     return (
         <SocketContext.Provider value={socket}>

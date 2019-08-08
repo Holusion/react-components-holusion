@@ -6,13 +6,14 @@ export function useSocket(eventKey, initial) {
     const [data, setData] = useState(initial);
     
     useEffect(() => {
+        if(!socket) return;
         const handler = function (data){
             console.log("Socket.on("+eventKey+")", data);
             setData(data);
         }
         socket.on(eventKey, handler);
         return () => socket.removeListener(eventKey, handler);
-    }, [eventKey]);
+    }, [socket, eventKey]);
 
     return data;
 }
@@ -20,21 +21,22 @@ export function useSocket(eventKey, initial) {
 export function useSocketState(){
     const socket = useContext(SocketContext);
     const [connected, setConnected] = useState(false);
-    const onconnected = function(){
-        console.log("connected");
-        setConnected(true);
-    }
-    const ondisconnected = function(){
-        setConnected(false);
-    }
     useEffect(() => {
+        if(!socket) return;
+        const onconnected = function(){
+            console.log("connected");
+            setConnected(true);
+        }
+        const ondisconnected = function(){
+            setConnected(false);
+        }
         socket.on("connect", onconnected);
         socket.on("disconnect", ondisconnected);
         return () => {
             socket.removeListener("connected", onconnected);
             socket.removeListener("disconnected", ondisconnected);
         }
-    },[]);
+    },[socket]);
     return connected;
 }
 

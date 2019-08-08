@@ -167,7 +167,7 @@ export default function Playlist(props) {
 
     const connected = useSocketState();
 
-    const playlist = useSocket("update", props.items);
+    const playlist = useSocket("update", []);
     const current = useSocket("current", {});
     
     const {acceptedFiles, getRootProps, getInputProps, isDragActive, open} = useDropzone({
