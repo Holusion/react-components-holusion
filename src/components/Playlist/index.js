@@ -3,11 +3,12 @@ import "./Playlist.css"
 import PlaylistItem from "../PlaylistItem";
 import PropTypes from 'prop-types'
 import React, { useState, useEffect, createRef, useCallback } from 'react'
-import {useSocket} from '../../hooks/useSocket';
+import {useSocket, useSocketState} from '../../hooks/useSocket';
 import url from 'url'
 
 import {useDropzone} from 'react-dropzone';
 import Uploader from "../Upload/Uploader";
+import UploadManager from "../Upload";
 import Spinner from "../Spinner";
 import Fab from "../Fab";
 
@@ -94,28 +95,7 @@ function selectOneItem(item, setSelected) {
     setSelected([item]);
 }
 
-function updateCurrent(props, setCurrent) {
-    fetch(url.resolve(`http://${props.url}`, "/control/current")).then(res => {
-        if(res && res.status == 200) {
-            res.json().then(current => setCurrent(current))
-        }
-    })
-}
 
-function updatePlaylist(props, setPlaylist, setCurrent) {
-    fetch(url.resolve(`http://${props.url}`, `/playlist`)).then(res => {
-        if(res && res.ok) {
-            res.json().then(playlist => {
-                setPlaylist(playlist);
-                updateCurrent(props, setCurrent);
-            })   
-        } else if(res.status == 204) {
-            setPlaylist([]);
-        } else {
-            throw new Error(`${res.status} - ${res.statusText}`);
-        }
-    })
-}
 
 function handleClick(props, item, selected, setSelected, event) {
     if(event.target.className === "card") {
@@ -182,33 +162,34 @@ SendLink.propTypes = {
 export default function Playlist(props) {
     // Default to connected in the beginning because we don't know socket's state
     //And it's probably true...
-    const [connected, setConnected] = useState(true);
     const [selected, setSelected] = useState([]);
-    const [playlist, setPlaylist] = useState([]);
-    const [current, setCurrent] = useState({});
-    const [isDrag, setDrag] = useState(false);
-    useEffect(() => updatePlaylist(props, setPlaylist, setCurrent), [props.url]);
-    useEffect(() => props.onSelectionChange(selected), [selected]);
+    const [uploads, setUploads] = useState([]);
+
+    const connected = useSocketState();
+
+    const playlist = useSocket("update", props.items);
+    const current = useSocket("current", {});
     
-    useSocket('disconnect', () => setConnected(false) );
-    useSocket('connect', () => setConnected(true) );
-    useSocket('error', (e) => {
-        console.error("Socket error : ", e);
-    })
-
-    useSocket('current', () => updateCurrent(props, setCurrent));
-    useSocket('insert', () => updatePlaylist(props, setPlaylist, setCurrent));
-    useSocket('remove', () => setTimeout(() => {
-        updatePlaylist(props, setPlaylist, setCurrent);
-    }, 1000));
-    useSocket('update', () => updatePlaylist(props, setPlaylist, setCurrent));
-
     const {acceptedFiles, getRootProps, getInputProps, isDragActive, open} = useDropzone({
-        noKeyboard: true
+        noKeyboard: true,
+        multiple: true
     });
-    const uploads = acceptedFiles.map((file, index)=>{
-        return (<Uploader file={file} url={url.resolve(`http://${props.url}`, "/medias")} key={file.path}/>);
+    let new_uploads = acceptedFiles.filter((f)=>{
+        return ! uploads.find((u)=> u["name"] = f["name"] && u["lastModified"] == f["lastModified"])
+    }).map((file)=>{
+        return {
+            item: (<Uploader file={file} url={url.resolve(`http://${props.url}`, "/medias")} key={file.path}/>),
+            lastModified: file.lastModified,
+            name: file.name,
+            path: file.path
+        };
     })
+    if(new_uploads.length != 0){
+        console.log("adding a new Upload");
+        setUploads([].concat(uploads, new_uploads));
+    }
+
+
     let cards = playlist.filter((elem) => props.filterBy(elem)).map(item => {
         let imgUrl = encodeURI(url.resolve(`http://${props.url}`, `/medias/${item.name}?thumb=true`).trim());
         return <PlaylistItem 
@@ -222,7 +203,7 @@ export default function Playlist(props) {
             onClick={(event) => handleClick(props, item, selected, setSelected, event)}
             onCheckboxChange={() => handleCheckboxChange(item, selected, setSelected)}
             onRemove={() => remove(props, item)}
-            onSwitchChange={() => setActive(props, item, setPlaylist, setCurrent)}
+            onSwitchChange={() => setActive(props, item)}
         />
     })
     if(cards.length == 0 && uploads.length == 0){
@@ -238,7 +219,7 @@ export default function Playlist(props) {
     }else{
         content = (<div className="playlist-content">
             {cards}
-            {uploads}
+            {uploads.map(u => u.item)}
         </div>)
     }
     let classes = "playlist-container"
