@@ -3,8 +3,7 @@
 .playlist-container {
     position: relative;
     display: flex;
-    flex-wrap: wrap;
-    padding: 8px auto;
+    padding: 8px;
     justify-self: stretch;
 }
 .playlist-container.drag{
@@ -41,9 +40,11 @@
 .playlist-container .playlist-drawer{
     position: sticky;
     right:0;
+    top: 8px;
     display: flex;
     flex-direction: column;
     overflow: visible;
+    align-self: flex-start;
 }
 .playlist-container .playlist-drawer a>svg{
     border: 1px solid currentColor;

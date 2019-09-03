@@ -8,7 +8,7 @@ export function useSocket(eventKey, initial) {
     useEffect(() => {
         if(!socket) return;
         const handler = function (data){
-            console.log("Socket.on("+eventKey+")", data);
+            //console.log("Socket.on("+eventKey+")", data);
             setData(data);
         }
         socket.on(eventKey, handler);
@@ -20,11 +20,11 @@ export function useSocket(eventKey, initial) {
 
 export function useSocketState(){
     const socket = useContext(SocketContext);
-    const [connected, setConnected] = useState(false);
+    const [connected, setConnected] = useState(socket.connected);
     useEffect(() => {
         if(!socket) return;
+
         const onconnected = function(){
-            console.log("connected");
             setConnected(true);
         }
         const ondisconnected = function(){
@@ -32,11 +32,15 @@ export function useSocketState(){
         }
         socket.on("connect", onconnected);
         socket.on("disconnect", ondisconnected);
+        // useEffect is called asynchronously
+        // Sometimes, socket gets connected between useState() and useEffect execution.
+        // So we need to check its _actual_ current state
+        setConnected(socket.connected);
         return () => {
             socket.removeListener("connected", onconnected);
             socket.removeListener("disconnected", ondisconnected);
         }
-    },[socket]);
+    },[]);
     return connected;
 }
 
