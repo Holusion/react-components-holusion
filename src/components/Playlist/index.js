@@ -71,7 +71,7 @@ function setActive(props, item) {
             'Content-Type': 'application/json'
         },
     }
-    fetch(url.resolve(`http://${props.url}`, `/playlist`), options).then(res => {
+    fetch(url.resolve(`http://${props.url}`, `/playlist/${item.name}`), options).then(res => {
         if(!res.ok) {
             const err = new Error(`${res.status} - ${res.statusText}`);
             props.onTaskEnd(`active-${item.name}`, err);            
@@ -166,7 +166,7 @@ export default function Playlist(props) {
     const [uploads, setUploads] = useState([]);
 
     const connected = useSocketState();
-    const playlist = useSocket("update", props.items);
+    const playlist = useSocket("change", props.items);
     const current = useSocket("current", {});
     
     const {acceptedFiles, getRootProps, getInputProps, isDragActive, open} = useDropzone({
@@ -187,7 +187,6 @@ export default function Playlist(props) {
         console.log("adding a new Upload");
         setUploads([].concat(uploads, new_uploads));
     }
-
 
     let cards = playlist.filter((elem) => props.filterBy(elem)).map(item => {
         let imgUrl = encodeURI(url.resolve(`http://${props.url}`, `/medias/${item.name}?thumb=true`).trim());
