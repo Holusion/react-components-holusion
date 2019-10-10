@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 import Spinner from "../Spinner";
 import Card from "../Card";
 
-import ErrorIcon from "../../icons/baseline-error_outline-24px.svg";
+import ErrorIcon from "../../icons/info.svg";
 
 export default function Uploader(props){
   const [error, setError] = useState(null);

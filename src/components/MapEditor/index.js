@@ -6,14 +6,18 @@ import PropTypes from 'prop-types'
 import Button from "../Button"
 import Icon from "../Icon"
 
-import './MapEditor.css';
-
 function MapLine(props){
   return (
-    <form className="map-editor-line">
-      <input type="text" size="8" className="line-name" id="confName" placeholder="identifiant" value={props.name} readOnly={true} />
-      <input type="text" size="10" className="line-value" id="confValue" placeholder="valeur" value={props.value} readOnly={true}/>
-      <Button onClick={(e)=>props.handleRemove(props.name)}><Icon name="remove" /></Button>
+    <form className="map-editor-line form-group">
+      <div className="input-group">
+        <div className="input-group-prepend">
+          <input type="text" size="8" className="line-name form-control" id="confName" placeholder="identifiant" value={props.name} readOnly={true} />
+        </div>
+        <input type="text" size="10" className="line-value form-control" id="confValue" placeholder="valeur" value={props.value} readOnly={true}/>
+        <div className="input-group-append">
+          <Button className="btn btn-outline-secondary py-0" onClick={(e)=>props.handleRemove(props.name)}><Icon name="remove" width="24px" height="24px"/></Button>
+        </div>
+      </div>
     </form>
   )
 }
@@ -28,7 +32,7 @@ function AddMapLine(props){
 
   if(!active){
     return (<div style={{display:"flex",justifyContent:"flex-end", width:"100%"}}>
-      <Button onClick={e=>setActive(true)} style={{flexGrow:1}}><Icon name="menu"></Icon>Add</Button>
+      <Button className="btn btn-outline-secondary" onClick={e=>setActive(true)} style={{flexGrow:1}}><Icon name="menu"></Icon>Add</Button>
       </div>)
   }
 
@@ -36,9 +40,15 @@ function AddMapLine(props){
   const confValue = React.createRef();
 
   return (<form className="map-editor-line new-line" onSubmit={e=> props.handleAdd(confName.current.value, confValue.current.value)}>
-    <input type="text" className="line-name" id="confName" placeholder="identifiant" ref={confName}/>
-    <input type="text" className="line-value" id="confValue" placeholder="valeur" ref={confValue}/>
-    <Button type="submit"><Icon name="play" /></Button>
+    <div className="input-group">
+      <div className="input-group-prepend">
+        <input type="text" className="line-name form-control" id="confName" placeholder="identifiant" ref={confName}/>
+      </div>
+      <input type="text" className="line-value form-control" id="confValue" placeholder="valeur" ref={confValue}/>
+      <div className="input-group-append">
+      <Button type="submit" className="btn btn-outline-secondary"><Icon name="play" /></Button>
+      </div>
+    </div>
   </form>)
 }
 
@@ -56,7 +66,7 @@ export default function MapEditor(props){
   }
 
   return (
-    <div className="map-editor-container">
+    <div className="w-100">
       {children}
       <AddMapLine handleAdd={(name, value)=> {
         const newItems = Array.from(items);

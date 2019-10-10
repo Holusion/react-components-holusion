@@ -24,11 +24,11 @@ export default function Radio(props){
     return (<RadioButton label={label}  value={value} checked={idx == selectedIndex} key={idx} onChange={e=> {
       setSelected(e.target.value);
       (typeof props.onChange === 'function' ) && props.onChange(e.target.value);
-    }}></RadioButton>)
+    }}/>)
   })
 
   return (
-    <div className="radio-container row">
+    <div className="radio-container d-flex">
       {children}
     </div>
   )

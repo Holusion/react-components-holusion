@@ -2,10 +2,10 @@ import "./Button.css"
 import PropTypes from 'prop-types';
 import React from 'react';
 
-export default function Button(props) {
+export default function Button({children, onClick, type, ...otherProps}) {
     return (
-        <button className="button" onClick={props.onClick} type={props.type}>
-            {props.children}
+        <button onClick={onClick} type={type} {...otherProps}>
+            {children}
         </button>
     )
 }

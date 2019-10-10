@@ -35,14 +35,30 @@ export default function Config(props){
   
   return (
     <div className="product-configuration" >
-      <label>Play content in loop or stop after each item?</label>
-      <Radio className="row" items={[{label:"loop", value:true}, {label:"don't loop", value: false}]} checked={opts.loop} onChange={val=>handleChange("loop", val == 'true')}/> 
-      <label>Raccourcis clavier</label>
-      <MapEditor items={opts.shortcuts} onChange={handleChange.bind(null,"shortcuts")}/>
-      <ScreenLayout conf={opts.screens} />
+      <div className="row no-gutters">
+        <div className="col">
+          <label>Play content in loop or stop after each item?</label>
+          <div className="form-group">
+            <Radio items={[{label:"loop", value:true}, {label:"don't loop", value: false}]} checked={opts.loop} onChange={val=>handleChange("loop", val == 'true')}/> 
+          </div>
+        </div>
+      </div>
+      <div className="row no-gutters">
+        <div className="col">
+          <label>Raccourcis clavier</label>
+          <MapEditor items={opts.shortcuts} onChange={handleChange.bind(null,"shortcuts")}/>
+          </div>
+      </div>
+      <div className="row no-gutters pt-4">
+        <div className="col">
+          <label>Ecrans</label>
+          <ScreenLayout conf={opts.screens} />
+        </div>
+      </div>
     </div>
   )
 }
 
 Config.propTypes = {
+  items: PropTypes.array,
 }
