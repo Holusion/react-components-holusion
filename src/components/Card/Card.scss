@@ -1,4 +1,4 @@
-@import url('../../variables.css');
+@import "../../_variables";
 
 .card {
     display: flex;
@@ -15,7 +15,7 @@
     border-radius: 4px;
     margin:1px;
     white-space: nowrap;
-    background-color: var(--theme-primary);
+    background-color: $dark;
     background-size: 100%;
 }
 

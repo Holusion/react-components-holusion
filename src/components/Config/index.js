@@ -7,7 +7,7 @@ import Radio from '../Radio';
 import MapEditor from '../MapEditor';
 
 import ScreenLayout from "./ScreenLayout";
-
+import Mimeapps from "./Mimeapps";
 import {useSocket, useSocketState} from '../../hooks/useSocket';
 
 export default function Config(props){
@@ -28,8 +28,7 @@ export default function Config(props){
     });
     const body = await r.json();
     if(!r.ok){
-      //FIXME : proper reporting
-      return console.error("Failed to save config : ", r.status, body);
+      return props.addToast(`Failed to save config (${body.code}) : ${body.message}`, {title: "error"});
     }
   }
   
@@ -55,10 +54,18 @@ export default function Config(props){
           <ScreenLayout conf={opts.screens} />
         </div>
       </div>
+      <div className="row no-gutters pt-4">
+        <Mimeapps value={opts.mimeapps} addToast={props.addToast} />
+      </div>
     </div>
   )
 }
 
 Config.propTypes = {
   items: PropTypes.array,
+  addToast: PropTypes.func,
+}
+
+Config.defaultProps = {
+  addToast: console.error
 }

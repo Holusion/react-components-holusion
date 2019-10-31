@@ -4,7 +4,6 @@ import PlaylistItem from "../PlaylistItem";
 import PropTypes from 'prop-types'
 import React, { useState, useEffect, createRef, useCallback } from 'react'
 import {useSocket, useSocketState} from '../../hooks/useSocket';
-import {useToaster} from "../../hooks/useToaster"
 
 import url from 'url'
 
@@ -14,16 +13,15 @@ import Uploader from "../Upload/Uploader";
 import Spinner from "../Spinner";
 import Fab from "../Fab";
 
+import SendLink from "./SendLink";
 
 import LinkIcon from "../../icons/baseline-link-24px.svg";
 import UploadIcon from "../../icons/upload.svg";
-import CheckIcon from "../../icons/check.svg";
 import CloseIcon from "../../icons/close.svg";
 import RefreshIcon from "../../icons/refresh.svg";
 import PoweroffIcon from "../../icons/baseline-power_off-24px.svg";
 
 function play(props, item) {
-    props.onTaskStart(`play-${item.name}`)
     let options = {
         method: 'PUT',
         headers: {
@@ -33,17 +31,15 @@ function play(props, item) {
     fetch(url.resolve(`http://${props.url}`, `/control/current/${item.name}`), options).then(res => {    
         if(!res.ok) {
             const err = new Error(`${res.status} - ${res.statusText}`);
-            props.onTaskEnd(`play-${item.name}`, err);
-        } else {
-            props.onTaskEnd(`play-${item.name}`);
+            props.addToast(`failed to play ${item.name} : ${err.message}`, {title: "error"});
         }
     }).catch(err => {
-        props.onTaskEnd(`play-${item.name}`, err)
+        props.addToast(`failed to play ${item.name} : ${err.message}`, {title: "error"});
     })
 }
 
 function remove(props, item) {
-    props.onTaskStart(`remove-${item.name}`);
+    //props.addToast(`removed ${item.name}`, {title: "info"});
     let options = {
         method: 'DELETE',
         body: null,
@@ -54,18 +50,16 @@ function remove(props, item) {
     fetch(url.resolve(`http://${props.url}`, `/medias/${encodeURIComponent(item.name)}`), options).then(res => {    
         if(!res.ok) {
             const err = new Error(`${res.status} - ${res.statusText}`);
-            props.onTaskEnd(`remove-${item.name}`, err);    
+
         } else {
-            item.visible = false;
-            props.onTaskEnd(`remove-${item.name}`);            
+            item.visible = false;         
         }
     }).catch(err => {
-        props.onTaskEnd(`remove-${item.name}`, err);   
+        props.addToast(`failed to remove ${item.name} : ${err.message}`, {title: "error"});
     })
 }
 
 function setActive(props, item) {
-    props.onTaskStart(`active-${item.name}`);
     let options = {
         method: 'PUT',
         body: JSON.stringify(Object.assign(item,{active:!item.active})),
@@ -76,17 +70,11 @@ function setActive(props, item) {
     fetch(url.resolve(`http://${props.url}`, `/playlist/${item.name}`), options).then(res => {
         if(!res.ok) {
             const err = new Error(`${res.status} - ${res.statusText}`);
-            props.onTaskEnd(`active-${item.name}`, err);            
-        } else {
-            props.onTaskEnd(`active-${item.name}`);
+            props.addToast(`failed to activate ${item.name} : ${err.message}`, {title: "error"});      
         }
     }).catch(err => {
-        props.onTaskEnd(`active-${item.name}`, err);
+        props.addToast(`failed to activate ${item.name} : ${err.message}`, {title: "error"});
     })
-}
-
-function select(item, selected, setSelected) {
-    setSelected([...selected, item])
 }
 
 function unselectItem(item, selected, setSelected) {
@@ -109,57 +97,11 @@ function handleClick(props, item, selected, setSelected, event) {
 }
 
 function handleCheckboxChange(item, selected, setSelected) {
-    const isSelected = selected.filter(elem => item.name === elem.name).length > 0;
-    isSelected ? unselectItem(item, selected, setSelected) : select(item, selected, setSelected);
+    const isSelected = selected.findIndex(elem => item.name === elem.name) != -1;
+    setSelected(isSelected ? selected.filter(elem => elem.name !== item.name) : [...selected, item]);
 }
 
 
-
-function SendLink({uri, ...props}){
-    const [state, setState] = useState({value:"", status: "ready"});
-    const ref = createRef();
-    function handleClick(e){
-        setState({value: state.value, status: "loading"});
-        fetch(url.resolve(uri,"/medias"), {method:"POST",headers:{"Content-Type":"application/json"}, body: JSON.stringify({uri:state.value})}).then(async r =>{
-            const newData = await r.json();
-            //console.log("set state : ", newData, "for component", props.component.name);
-            if(!r.ok){
-                console.log("Error :",r.message, "for SendLink");
-                setState({value: state.value, status: "error"});
-            }else{
-                setState({value: "", status: "ready"});
-            }
-        }, (e)=>{
-            console.log("caught error", e, " for SendLink");
-            setState({value: state.value, status: "error"});
-        })
-    };
-    function handleChange(e){
-        setState({value:e.target.value, status: "ready"})
-    }
-    let icn;
-    switch(state.status){
-        case "ready":
-            icn = (<CheckIcon/>);
-            break;
-        case "loading":
-            icn = (<RefreshIcon/>);
-            break;
-        case "error":
-        default:
-            icn = (<RefreshIcon/>);
-            break;
-    }
-
-    return (<span {...props}>
-        <a onClick={handleClick} style={{color:"green"}} title="send link">{icn}</a>
-        <input  type="text" placeholder="https://example.com" value={state.value} onChange={handleChange}/>
-    </span>)
-}
-
-SendLink.propTypes = {
-    uri: PropTypes.string.isRequired
-}
 
 export default function Playlist(props) {
     // Default to connected in the beginning because we don't know socket's state
@@ -170,25 +112,29 @@ export default function Playlist(props) {
     const connected = useSocketState();
     const playlist = useSocket("change", props.items);
     const current = useSocket("current", {});
-    
-    const {acceptedFiles, getRootProps, getInputProps, isDragActive, open} = useDropzone({
+    const onDrop = useCallback(acceptedFiles=>{
+        let new_uploads = acceptedFiles.filter((f)=>{
+            return ! uploads.find((u)=> u["name"] = f["name"] && u["lastModified"] == f["lastModified"])
+        }).map((file)=>{
+            return {
+                item: (<Uploader file={file} url={url.resolve(`http://${props.url}`, "/medias")} key={file.path}/>),
+                lastModified: file.lastModified,
+                name: file.name,
+                path: file.path
+            };
+        })
+        if(new_uploads.length != 0){
+            console.log("adding a new Upload");
+            setUploads([].concat(uploads, new_uploads));
+        }
+    })
+
+    const {getRootProps, getInputProps, isDragActive, open} = useDropzone({
+        onDrop,
         noKeyboard: true,
         multiple: true
     });
-    let new_uploads = acceptedFiles.filter((f)=>{
-        return ! uploads.find((u)=> u["name"] = f["name"] && u["lastModified"] == f["lastModified"])
-    }).map((file)=>{
-        return {
-            item: (<Uploader file={file} url={url.resolve(`http://${props.url}`, "/medias")} key={file.path}/>),
-            lastModified: file.lastModified,
-            name: file.name,
-            path: file.path
-        };
-    })
-    if(new_uploads.length != 0){
-        console.log("adding a new Upload");
-        setUploads([].concat(uploads, new_uploads));
-    }
+   
 
     let cards = playlist.filter((elem) => props.filterBy(elem)).map(item => {
         let imgUrl = encodeURI(url.resolve(`http://${props.url}`, `/medias/${item.name}?thumb=true`).trim());
@@ -222,14 +168,22 @@ export default function Playlist(props) {
             {uploads.map(u => u.item)}
         </div>)
     }
-    let classes = "playlist-container"
+    let classes = "playlist-container";
     if(isDragActive) classes += ` drag`;
+    console.log("drag : ", isDragActive);
     if(!connected) classes += ` disconnected`;
+    
+    const onDragStart = useCallback((e)=>{
+        e.dataTransfer.effectAllowed = "copyMove";
+        e.preventDefault();
+    })
     return (
         
-        <div {...getRootProps({ className:classes, onClick:(e)=>{e.target.classList.contains("fab-container") || e.stopPropagation()}})}>
+        <div {...getRootProps({ className:classes, onDragStart:onDragStart, onDragOver:e=>e.preventDefault(), onClick:(e)=>{e.target.classList.contains("fab-container") || e.stopPropagation()}})}>
             <input {...getInputProps()} />
-            {content}
+            <div className="playlist-content-wrap">
+                {content}
+            </div>
             <div className="playlist-drawer">
                 <a onClick={(e)=>open(e)} title="Upload a new media"><UploadIcon/></a>
                 <span className="folded-drawer-item" >
@@ -248,14 +202,12 @@ export default function Playlist(props) {
 Playlist.propTypes = {
     url: PropTypes.string.isRequired,
     filterBy: PropTypes.func,
-    onTaskStart: PropTypes.func,
-    onTaskEnd: PropTypes.func,
     onSelectionChange: PropTypes.func,
+    addToast: PropTypes.func,
 }
 
 Playlist.defaultProps = {
-    onTaskStart: () => {},
-    onTaskEnd: () => {},
     onSelectionChange: () => {},
     filterBy: () => true,
+    addToast: console.error,
 }

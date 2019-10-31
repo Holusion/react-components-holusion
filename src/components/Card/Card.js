@@ -1,4 +1,4 @@
-import './Card.css'
+import './Card.scss'
 import PropTypes from 'prop-types'
 import React from 'react'
 
@@ -30,5 +30,5 @@ Card.propTypes = {
     children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
     title: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
     image: PropTypes.string,
-    size: PropTypes.number
+    size: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
 }

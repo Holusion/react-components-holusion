@@ -3,7 +3,7 @@
 import React, {useEffect} from "react";
 import PropTypes from "prop-types"
 
-import useToaster from "../../hooks/useToaster";
+import {useToaster} from "../../hooks/useToaster";
 import InfoIcon from "../../icons/info.svg"
 import "./toast.scss"
 
@@ -17,6 +17,9 @@ function Toast(props){
       break;
     case "error":
       header_class += " text-danger";
+      break;
+    case "log":
+      header_class += " text-dark";
       break;
     case "info":
     default:

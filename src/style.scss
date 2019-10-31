@@ -1,2 +1,9 @@
 @import "variables";
 @import "~bootstrap/scss/bootstrap";
+
+/*
+ * Custom CSS
+ */
+.btn svg path:not([fill="none"]) {
+  fill: currentColor;
+}

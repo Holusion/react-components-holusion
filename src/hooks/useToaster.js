@@ -40,7 +40,7 @@ const dismiss = (id, removeToast) => {
 let _uid = 0;
 function getUid(){ return ++_uid}
 
-export default () => {
+export function useToaster(){
   const [toastList, dispatch] = useReducer(toastReducer, []);
   const removeToast = id => dispatch({ type: 'remove', id });
   

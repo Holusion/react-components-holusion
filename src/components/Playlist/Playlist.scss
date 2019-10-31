@@ -1,51 +1,79 @@
-@import "../../variables";
-
+@import "../../_variables";
+@import "~bootstrap/scss/mixins";
 .playlist-container {
     position: relative;
     display: flex;
-    padding: 8px;
+    flex-direction: column-reverse;
     justify-self: stretch;
+    &.drag{
+        opacity:0.5;
+        &:before{
+            content:"Drop files here";
+            color: white;
+            background: rgba(0,0,0, 0.3);
+            opacity: 1;
+            font-size: 2rem;
+            display:block;
+            width:100%;
+            height:100%;
+            min-height: 200px;
+            padding-top: 100px;
+            position: absolute;
+            z-index: 10;
+            margin: auto;
+            box-sizing: border-box;
+            text-align: center;
+            border: 3px dashed var(--theme-primary);
+        }
+    }
 }
-.playlist-container.drag{
-    opacity:0.5;
-}
-.playlist-container.drag::after{
-    content:"Drop files here";
-    color: white;
-    background: rgba(0,0,0, 0.3);
-    opacity: 1;
-    font-size: 2rem;
-    display:block;
-    width:100%;
-    height:100%;
-    min-height: 200px;
-    padding-top: 100px;
-    position: absolute;
-    margin: auto;
-    box-sizing: border-box;
-    text-align: center;
-    border: 3px dashed var(--theme-primary);
+.playlist-container .playlist-drawer{
+    display: flex;
+    flex-direction: row-reverse;
+    overflow: visible;
+    align-self: stretch;
+    position: sticky;
+    right:0;
+    top: 0;
+    background: white;
+    padding: 10px 0.5rem;
+
 }
 
+
+.playlist-container .playlist-content-wrap {
+    padding: 10px 0;
+    flex-grow: 1;
+}
 .playlist-container .playlist-content {
-    display: flex;
-    flex-wrap: wrap;
-    flex-grow:1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, max-content));
+    grid-auto-rows: minmax(200px, max-content);
+    @include media-breakpoint-down(xs){
+        padding: 0 0.5rem;
+        grid-template-columns: 1fr 1fr;
+        grid-auto-rows: calc(50vw - 1.5rem);
+    }
+    justify-content: center;
+    grid-gap: 1rem;
+}
+
+@include media-breakpoint-up(lg){
+    .playlist-container{
+        flex-direction: row;
+    }
+    .playlist-container .playlist-drawer{
+        flex-direction: column;
+        align-self: flex-start;
+    }
 }
 
 .playlist-container.disconnected .playlist-content{
     pointer-events: none;
     opacity:0.4;
 }
-.playlist-container .playlist-drawer{
-    position: sticky;
-    right:0;
-    top: 8px;
-    display: flex;
-    flex-direction: column;
-    overflow: visible;
-    align-self: flex-start;
-}
+
+
 
 .playlist-container .playlist-drawer a{
     padding: 4px;
@@ -53,7 +81,8 @@
     border: 1px solid currentColor;
     background: white;
     color: theme-color("primary");
-    margin-bottom: 2px;
+    margin: 2px;
+    width:34px;
 }
 
 .playlist-container svg path:not([fill]){
@@ -69,7 +98,6 @@
 .playlist-container .folded-drawer-item{
     display:flex;
     position: relative;
-    width:34px;
     flex-direction: column-reverse;
 }
 
