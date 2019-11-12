@@ -8,6 +8,8 @@ import Icon from "../Icon"
 
 
 import IconSave from "../../icons/save.svg";
+import IconAdd from "../../icons/note_add.svg";
+
 
 function MapLine(props){
   const editable = typeof props.handleChange === "function"; 
@@ -19,7 +21,7 @@ function MapLine(props){
         </div>
         <input name={props.name} type="text" size="10" className="line-value form-control" id="confValue" placeholder="valeur" value={props.value} onChange={props.handleChange} readOnly={!editable}/>
         <div className="input-group-append">
-          <Button className="btn btn-outline-secondary py-0" onClick={(e)=>props.handleRemove(props.name)}><Icon name="remove" width="24px" height="24px"/></Button>
+          <Button className="btn btn-outline-secondary py-0" onClick={(e)=>{e.preventDefault();props.handleRemove(props.name)}}><Icon name="remove" width="24px" height="24px"/></Button>
         </div>
       </div>
     </form>
@@ -33,13 +35,6 @@ MapLine.propTypes = {
 }
 
 function AddMapLine(props){
-  const [active, setActive] = useState(false);
-
-  if(!active){
-    return (<div style={{display:"flex",justifyContent:"flex-end", width:"100%"}}>
-      <Button className="btn btn-outline-secondary" onClick={e=>setActive(true)} style={{flexGrow:1}}><Icon name="menu"></Icon>Add</Button>
-      </div>)
-  }
 
   const confName = React.createRef();
   const confValue = React.createRef();
@@ -47,11 +42,11 @@ function AddMapLine(props){
   return (<form className="map-editor-line new-line" onSubmit={e=> {e.preventDefault(); props.handleAdd(confName.current.value, confValue.current.value)}}>
     <div className="input-group">
       <div className="input-group-prepend">
-        <input type="text" className="line-name form-control" id="confName" placeholder="identifiant" ref={confName}/>
+        <input type="text" size="8" className="line-name form-control" id="confName" placeholder="identifiant" required ref={confName}/>
       </div>
-      <input type="text" className="line-value form-control" id="confValue" placeholder="valeur" ref={confValue}/>
+      <input type="text" size="10" className="line-value form-control" id="confValue" placeholder="valeur" required ref={confValue}/>
       <div className="input-group-append">
-      <Button type="submit" className="btn btn-outline-secondary"><Icon name="play" /></Button>
+      <Button type="submit" className="btn btn-outline-secondary"><IconAdd/></Button>
       </div>
     </div>
   </form>)
@@ -59,59 +54,63 @@ function AddMapLine(props){
 
 
 export default function MapEditor(props){
-  const [items, setItems] = useState(props.items);
+  const savedItems = new Map(props.items); // will make props.items a map if not already done
+  const [localItems, setItems] = useState(savedItems);
+  const [isLoading, setLoading] = useState(false);
+  const hasChanges = savedItems.size != localItems.size || JSON.stringify([...savedItems]) != JSON.stringify([...localItems]);
+  //console.info("Has changes : ", hasChanges, "sizes:", savedItems.size, localItems.size, "strings : \n",JSON.stringify([...savedItems]),"\n", JSON.stringify([...localItems]));
   const children = [];
 
-  const has_changes = items.size != props.items.size || JSON.stringify([...items]) != JSON.stringify([...props.items]);
-
-
-  function saveChanges(new_items){
-    setItems(new_items) //optimistic update
-    props.onChange(new_items); //props.items should eventually change to make has_changes clean again
-  }
-  
-  for (const [key, value] of items){
+  for (const [key, value] of localItems){
     children.push(<MapLine 
       key={key} 
       name={key} 
       value={value}
       handleRemove={(name)=>{
-        const newItems = items.filter(([keyName])=> keyName != name);
-        setItems(newItems);
-        props.onChange(clone);
+        const newItems = new Map(localItems);
+        newItems.delete(name);
+        if(newItems.size !== localItems.size){
+          console.error("Failed to remove :", name);
+        }
+        setItems(newItems)
       }}
       handleChange={props.editable? (e)=>{
         const key = e.target.name;
         const value = e.target.value;
-        const clone = new Map(items);
-        clone.set(key, value);
-        setItems(clone);
-        props.onChange(clone)
+        const newItems = new Map(localItems);
+        newItems.set(key, value);
+        setItems(newItems);
       } : undefined}
     />)
   }
 
+  function saveChanges(){
+    setLoading(true);
+    props.onChange(Array.from(localItems)).then(()=>{
+      setLoading(false);
+    })
+  }
+  
   return (
     <div className="w-100">
       <div className="w-100 d-flex justify-content-between align-items-center">
         <h3>Configuration</h3>
-        <button onClick={()=>props.onChange(items)} className={`btn btn-outline-${has_changes?"warning":"success"}`} title={has_changes?"changementss en attente":"sauvegardé"}>
-          {has_changes? <span className="spinner-border spinner-border-sm" role="status"/> : <IconSave/>}
+        <button onClick={saveChanges} className={`btn text-${hasChanges?"warning":"success"}`} title={hasChanges?"changementss en attente":"sauvegardé"}>
+          {isLoading? <span className="spinner-border spinner-border-sm" role="status"/> : <IconSave/>}
         </button>
       </div>
       {children}
-      <AddMapLine key={(items.size|| items.length) +1} handleAdd={(name, value)=> {
-        const newItems = new Map(items);
+      <AddMapLine key={localItems.size +1} handleAdd={(name, value)=> {
+        const newItems = new Map(localItems);
         newItems.set(name, value);
         setItems(newItems);
-        props.onChange(newItems);
       }}/>
     </div>
   )
 }
 
 MapEditor.propTypes = {
-  items: PropTypes.oneOfType([PropTypes.array,PropTypes.instanceOf(Map)]).isRequired,
+  items: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.string)),PropTypes.instanceOf(Map)]).isRequired,
   editable: PropTypes.bool,
   onChange: PropTypes.func.isRequired
 }

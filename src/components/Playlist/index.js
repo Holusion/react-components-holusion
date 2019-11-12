@@ -21,6 +21,8 @@ import CloseIcon from "../../icons/close.svg";
 import RefreshIcon from "../../icons/refresh.svg";
 import PoweroffIcon from "../../icons/baseline-power_off-24px.svg";
 
+import { toast } from 'react-toastify';
+
 function play(props, item) {
     let options = {
         method: 'PUT',
@@ -31,15 +33,14 @@ function play(props, item) {
     fetch(url.resolve(`http://${props.url}`, `/control/current/${item.name}`), options).then(res => {    
         if(!res.ok) {
             const err = new Error(`${res.status} - ${res.statusText}`);
-            props.addToast(`failed to play ${item.name} : ${err.message}`, {title: "error"});
+            toast.error(`failed to play ${item.name} : ${err.message}`);
         }
     }).catch(err => {
-        props.addToast(`failed to play ${item.name} : ${err.message}`, {title: "error"});
+        toast.error(`failed to play ${item.name} : ${err.message}`);
     })
 }
 
 function remove(props, item) {
-    //props.addToast(`removed ${item.name}`, {title: "info"});
     let options = {
         method: 'DELETE',
         body: null,
@@ -55,7 +56,7 @@ function remove(props, item) {
             item.visible = false;         
         }
     }).catch(err => {
-        props.addToast(`failed to remove ${item.name} : ${err.message}`, {title: "error"});
+        toast.error(`failed to remove ${item.name} : ${err.message}`);
     })
 }
 
@@ -70,10 +71,10 @@ function setActive(props, item) {
     fetch(url.resolve(`http://${props.url}`, `/playlist/${item.name}`), options).then(res => {
         if(!res.ok) {
             const err = new Error(`${res.status} - ${res.statusText}`);
-            props.addToast(`failed to activate ${item.name} : ${err.message}`, {title: "error"});      
+            toast.error(`failed to activate ${item.name} : ${err.message}`);      
         }
     }).catch(err => {
-        props.addToast(`failed to activate ${item.name} : ${err.message}`, {title: "error"});
+        toast.error(`failed to activate ${item.name} : ${err.message}`);
     })
 }
 
@@ -203,11 +204,9 @@ Playlist.propTypes = {
     url: PropTypes.string.isRequired,
     filterBy: PropTypes.func,
     onSelectionChange: PropTypes.func,
-    addToast: PropTypes.func,
 }
 
 Playlist.defaultProps = {
     onSelectionChange: () => {},
     filterBy: () => true,
-    addToast: console.error,
 }

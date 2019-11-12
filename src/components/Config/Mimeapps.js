@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import Spinner from "../Spinner";
 
 import {useFetch} from "../../hooks/useFetch";
+import { toast } from 'react-toastify';
 
 import IconSave from "../../icons/save.svg";
 
@@ -26,11 +27,11 @@ export default function Mimeapps(props){
         console.info("changes saved");
       }else{
         r.text().then((msg)=>{
-          props.addToast(msg, {title:"warn"});
+          toast.warn(msg);
         })
       }
     }, (e)=>{
-      props.addToast("Fail to save mime associations : "+e.message, {title:"warn"});
+      toast.warn("Fail to save mime associations : "+e.message);
     })
     .then(()=> setLoading(false));
   }
@@ -41,7 +42,7 @@ export default function Mimeapps(props){
     <div className="d-flex align-content-between w-100">
       <label className="flex-grow-1">Associations "mime"</label> 
       <button disabled={isLoading} className={`btn btn-outline-muted${hasChanges?" text-danger": " text-success"}`} onClick={handleSave}>
-        {isLoading ?  <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> : <IconSave/>}
+        {isLoading ?  <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> : <IconSave/>}
         </button>
     </div>
     <div className="form-group">
@@ -53,11 +54,9 @@ export default function Mimeapps(props){
 }
 
 Mimeapps.propTypes = {
-  addToast: PropTypes.func,
   value: PropTypes.object,
 }
 
 Mimeapps.defaultProps = {
-  addToast: console.error,
   value: {},
 }
