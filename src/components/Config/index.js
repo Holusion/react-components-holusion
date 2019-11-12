@@ -13,8 +13,13 @@ import { toast } from 'react-toastify';
 import TextConfItem from "./TextConfItem";
 import {useSocket, useSocketState} from '../../hooks/useSocket';
 
+import PoweroffIcon from "../../icons/baseline-power_off-24px.svg";
+
+
 export default function Config(props){
   const items = useSocket("update", props.items);
+  const connected = useSocketState();
+
   const opts =  items.reduce((res, {key, value}) =>{
     res[key] = value;
     return res;
@@ -37,6 +42,19 @@ export default function Config(props){
  console.log("Configuration values : ", opts.mimeapps, opts.screens); 
   return (
     <div className="product-configuration" >
+      <div className="row no-gutters">
+        <div className="d-flex justify-content-between w-100">
+          <h2>Configuration</h2>
+          {!connected && (
+            <button disabled className={`btn text-muted`}>
+              <Spinner active style={{margin: 0}} size={34} title="Connection lost...">
+                <PoweroffIcon  style={{opacity:0.4, padding:"0px"}}/>
+              </Spinner>
+            </button>
+          )}
+          
+        </div>
+      </div>
       <div className="row no-gutters">
         <div className="col">
           <label>Play content in loop or stop after each item?</label>

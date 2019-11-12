@@ -86,7 +86,9 @@ export default function MapEditor(props){
 
   function saveChanges(){
     setLoading(true);
-    props.onChange(Array.from(localItems)).then(()=>{
+    const res = props.onChange(Array.from(localItems));
+    Promise.resolve(res)
+    .then(()=>{
       setLoading(false);
     })
   }

@@ -194,7 +194,7 @@ export default function Playlist(props) {
                 </span>
                 <Spinner active={!connected} style={{color:"var(--theme-primary)", margin: 0}} size={34} title="Connection lost...">
                     <PoweroffIcon  style={{opacity:0.4, padding:"5px"}}/>
-                    </Spinner>
+                </Spinner>
             </div>
         </div>
     )

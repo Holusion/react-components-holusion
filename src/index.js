@@ -19,7 +19,6 @@ export {default as Radio} from './components/Radio'
 export {default as uploader} from './components/Upload'
 export {default as Tab} from './components/Tab'
 export {default as Tabbar} from './components/Tabbar'
-export {default as Toast} from "./components/Toast";
 
 export { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';

@@ -63,7 +63,7 @@ export function ItemConfig(props){
         <div className="playlist-item-configuration-container container">
             <h2>Configuration de {props.name}</h2>
             <a className="playlist-item-configuration-close text-danger" onClick={()=>props.onClose()}><IconClose/></a>
-            <MapEditor editable items={items} onChange={(val)=>props.onChange(mapToObject(val))}/>
+            <MapEditor editable items={items} onChange={(val)=> props.onChange(mapToObject(val))}/>
         </div>
     </div>)
 }
@@ -90,7 +90,7 @@ export default function PlaylistItem(props) {
     )
     function handleChange(key, value){
         console.info("change key ", key, "to", value, "for : ", props.item.name);
-        fetch(`/playlist/${encodeURIComponent(props.item.name)}`, {
+        return fetch(`/playlist/${encodeURIComponent(props.item.name)}`, {
             method:"PUT", 
             headers:{"Content-Type":"application/json"},
             body: JSON.stringify({
