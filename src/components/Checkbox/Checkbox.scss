@@ -1,0 +1,26 @@
+@import "../../_variables";
+
+.custom-checkbox{
+  /* sizing */
+  $size: 2rem;
+  $pad: 0.25rem;
+  padding-left: $size;
+  min-height: $size;
+  .custom-control-label::before, .custom-control-label::after {
+    top: $pad;
+    left: - $size + $pad;
+    width: $size - $pad * 2;
+    height: $size - $pad * 2;
+  }
+
+  /* styling*/
+  .custom-control-label::before {
+    border: $grey-600 solid 1px;
+    transition: background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+  }
+  .custom-control-input:checked  ~ .custom-control-label::before {
+    color: $white;
+    border-color: $cyan;
+    background-color: $cyan;
+  }
+}

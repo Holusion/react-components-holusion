@@ -18,19 +18,20 @@ import SendLink from "./SendLink";
 import LinkIcon from "../../icons/baseline-link-24px.svg";
 import UploadIcon from "../../icons/upload.svg";
 import CloseIcon from "../../icons/close.svg";
+import RemoveIcon from "../../icons/remove.svg"
 import RefreshIcon from "../../icons/refresh.svg";
 import PoweroffIcon from "../../icons/baseline-power_off-24px.svg";
 
 import { toast } from 'react-toastify';
 
-function play(props, item) {
+function play(item) {
     let options = {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
     }
-    fetch(url.resolve(`http://${props.url}`, `/control/current/${item.name}`), options).then(res => {    
+    fetch(`/control/current/${item.name}`, options).then(res => {    
         if(!res.ok) {
             const err = new Error(`${res.status} - ${res.statusText}`);
             toast.error(`failed to play ${item.name} : ${err.message}`);
@@ -40,7 +41,7 @@ function play(props, item) {
     })
 }
 
-function remove(props, item) {
+function remove(item) {
     let options = {
         method: 'DELETE',
         body: null,
@@ -48,7 +49,7 @@ function remove(props, item) {
             'Content-Type': 'application/json'
         },
     }
-    fetch(url.resolve(`http://${props.url}`, `/medias/${encodeURIComponent(item.name)}`), options).then(res => {    
+    return fetch(`/medias/${encodeURIComponent(item.name)}`, options).then(res => {
         if(!res.ok) {
             const err = new Error(`${res.status} - ${res.statusText}`);
 
@@ -60,7 +61,11 @@ function remove(props, item) {
     })
 }
 
-function setActive(props, item) {
+function deleteSelection(selection){
+    return Promise.all(selection.map(item=>remove(item))) //should not fail as errors are caught in remove()
+}
+
+function setActive(item) {
     let options = {
         method: 'PUT',
         body: JSON.stringify(Object.assign(item,{active:!item.active})),
@@ -68,7 +73,7 @@ function setActive(props, item) {
             'Content-Type': 'application/json'
         },
     }
-    fetch(url.resolve(`http://${props.url}`, `/playlist/${item.name}`), options).then(res => {
+    fetch(`/playlist/${item.name}`, options).then(res => {
         if(!res.ok) {
             const err = new Error(`${res.status} - ${res.statusText}`);
             toast.error(`failed to activate ${item.name} : ${err.message}`);      
@@ -102,17 +107,19 @@ function handleCheckboxChange(item, selected, setSelected) {
     setSelected(isSelected ? selected.filter(elem => elem.name !== item.name) : [...selected, item]);
 }
 
-
+function onDragStart(e){
+    e.dataTransfer.effectAllowed = "copyMove";
+    e.preventDefault();
+}
 
 export default function Playlist(props) {
-    // Default to connected in the beginning because we don't know socket's state
-    //And it's probably true...
     const [selected, setSelected] = useState([]);
     const [uploads, setUploads] = useState([]);
 
     const connected = useSocketState();
     const playlist = useSocket("change", props.items);
     const current = useSocket("current", {});
+
     const onDrop = useCallback(acceptedFiles=>{
         let new_uploads = acceptedFiles.filter((f)=>{
             return ! uploads.find((u)=> u["name"] = f["name"] && u["lastModified"] == f["lastModified"])
@@ -146,11 +153,11 @@ export default function Playlist(props) {
             current={current.name == item.name}
             visible = {item.visible != null ? false : true}
             selected={selected.filter(elem => item.name === elem.name).length > 0}
-            onPlay={() => play(props, item)}
+            onPlay={() => play(item)}
             onClick={(event) => handleClick(props, item, selected, setSelected, event)}
             onCheckboxChange={() => handleCheckboxChange(item, selected, setSelected)}
-            onRemove={() => remove(props, item)}
-            onSwitchChange={() => setActive(props, item)}
+            onRemove={() => remove(item)}
+            onSwitchChange={() => setActive(item)}
         />
     })
     if(cards.length == 0 && uploads.length == 0){
@@ -160,6 +167,7 @@ export default function Playlist(props) {
             <p>The upload button is the blue box with this icon <UploadIcon/> in the top right corner of your screen</p>
         </div>)
     }
+
     let content;
     if(!connected && cards.length == 0){
         content = (<Spinner active />)
@@ -169,15 +177,12 @@ export default function Playlist(props) {
             {uploads.map(u => u.item)}
         </div>)
     }
+
     let classes = "playlist-container";
     if(isDragActive) classes += ` drag`;
-    console.log("drag : ", isDragActive);
     if(!connected) classes += ` disconnected`;
     
-    const onDragStart = useCallback((e)=>{
-        e.dataTransfer.effectAllowed = "copyMove";
-        e.preventDefault();
-    })
+
     return (
         
         <div {...getRootProps({ className:classes, onDragStart:onDragStart, onDragOver:e=>e.preventDefault(), onClick:(e)=>{e.target.classList.contains("fab-container") || e.stopPropagation()}})}>
@@ -195,6 +200,9 @@ export default function Playlist(props) {
                 <Spinner active={!connected} style={{color:"var(--theme-primary)", margin: 0}} size={34} title="Connection lost...">
                     <PoweroffIcon  style={{opacity:0.4, padding:"5px"}}/>
                 </Spinner>
+                {Array.isArray(selected) && 0 < selected.length && (<React.Fragment>
+                <a onClick={()=>deleteSelection(selected)} title="Delete selected"><RemoveIcon/></a>
+                </React.Fragment>)}
             </div>
         </div>
     )

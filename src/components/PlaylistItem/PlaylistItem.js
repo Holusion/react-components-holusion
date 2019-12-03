@@ -11,7 +11,12 @@ import MapEditor from '../MapEditor';
 import IconClose from "../../icons/close.svg";
 
 
-function createTop(props) {
+const itemShape = PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    active: PropTypes.bool.isRequired,
+});
+
+function ItemTop(props) {
     return (
         <div className="playlist-item-top">
             <div className="playlist-item-top-left">
@@ -29,14 +34,25 @@ function createTop(props) {
     )
 }
 
-function createPrimary(props) {
-    const display = props.current ? <Icon name="play" width="100" height="100" /> : null;
+ItemTop.propTypes = {
+    onCheckboxChange : PropTypes.func.isRequired,
+    onSwitchChange : PropTypes.func.isRequired,
+    onRemove : PropTypes.func.isRequired, 
+    selected : PropTypes.bool,
+    item : itemShape.isRequired,
+}
 
+function ItemPrimary(props) {
+    const display = props.current ? <Icon name="play" width="100" height="100" /> : null;
     return (
-        <div  className="playlist-item-current">
+        <div  className="playlist-item-current" onClick={props.onClick}>
             {display}
         </div>
     )
+}
+ItemPrimary.propTypes = {
+    current: PropTypes.bool,
+    onClick: PropTypes.func,
 }
 
 function mapToObject(m){
@@ -80,7 +96,7 @@ export default function PlaylistItem(props) {
     const [withConfig, showConfig] = useState(false);
     const bottom = (
         <div className="playlist-item-bottom">
-            <div className="playlist-item-title">
+            <div className="playlist-item-title" onClick={props.onPlay}>
                 <span>{props.item.name}</span>
             </div>
             <div className="playlist-item-main-action">
@@ -88,6 +104,10 @@ export default function PlaylistItem(props) {
             </div>
         </div>
     )
+    /*
+     * Callback functions
+     * TODO : check performance and use memoization if necessary
+     */
     function handleChange(key, value){
         console.info("change key ", key, "to", value, "for : ", props.item.name);
         return fetch(`/playlist/${encodeURIComponent(props.item.name)}`, {
@@ -108,16 +128,20 @@ export default function PlaylistItem(props) {
     return (
         <div className={`playlist-item ${props.selected ? "selected" : ""} ${props.item.active ? "active" : ""} ${props.visible ? "visible" : ""}`} onClick={props.onClick} title={props.item.name}>
             {withConfig && (<ItemConfig onClose={()=>showConfig(false)} onChange={value =>handleChange("conf", value)} {...props.item}/>)}
-            <Card onClick={props.onPlay} top={createTop(props)}  title={bottom} image={props.image} size="100%">{createPrimary(props)}</Card>
+            <Card
+                top={<ItemTop {...props}/>}  
+                title={bottom} 
+                image={props.image} 
+                size="100%"
+            >
+                <ItemPrimary current={props.current} onClick={props.onPlay} />
+            </Card>
         </div>
     )
 }
 
 PlaylistItem.propTypes = {
-    item: PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        active: PropTypes.bool.isRequired,
-    }).isRequired,
+    item: itemShape.isRequired,
     image: PropTypes.string,
     current: PropTypes.bool,
     selected: PropTypes.bool,

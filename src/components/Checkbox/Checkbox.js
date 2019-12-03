@@ -1,20 +1,21 @@
-import './Checkbox.css'
+import './Checkbox.scss'
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, {useState} from 'react'
 
 export default function Checkbox(props) {
-    const id = '_' + Math.random().toString(36).substr(2, 9)
+    const [id] = useState('_' + Math.random().toString(36).substr(2, 9))
     
     return (
-        <div className="checkbox-container">
-            <input type="checkbox" className="checkbox" title={props.title} id={id} checked={props.checked} onChange={props.onChange}/>
-            <label htmlFor={id} />
+        <div className="custom-control custom-checkbox">
+            <input type="checkbox" className="custom-control-input" title={props.title} id={id} checked={props.checked} onChange={props.onChange}/>
+            <label htmlFor={id} className="custom-control-label">{props.label}</label>
         </div>
     )
 }
 
 Checkbox.propTypes = {
     title: PropTypes.string,
+    label: PropTypes.string,
     onChange: PropTypes.func,
     checked: PropTypes.bool
 }

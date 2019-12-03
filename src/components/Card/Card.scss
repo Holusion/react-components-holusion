@@ -19,22 +19,25 @@
     background-size: 100%;
 }
 
-.card-top {
-    display: flex;
-    z-index: 1;
-}
 
-.card-content{
-    flex-grow: 1;
-    position: relative;
-}
 
 .card .card-content {
     z-index: 0;
+    flex-grow: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
     background-repeat: no-repeat;
     background-size: 100%;
     background-size: cover;
     background-position: center;
+    .card-top {
+        display: flex;
+        z-index: 1;
+    }
+    .card-primary {
+        flex-grow: 1;
+    }
 }
 
 .card .card-bottom {
