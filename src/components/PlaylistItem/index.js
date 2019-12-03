@@ -1,1 +1,1 @@
-export {default} from './PlaylistItem'
+export {default, DraggablePlaylistItem} from './PlaylistItem'

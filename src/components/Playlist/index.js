@@ -1,14 +1,18 @@
 'use strict'
 import "./Playlist.scss"
-import PlaylistItem from "../PlaylistItem";
+import {DraggablePlaylistItem} from "../PlaylistItem";
 import PropTypes from 'prop-types'
-import React, { useState, useEffect, createRef, useCallback } from 'react'
+import React, { useState, useCallback } from 'react'
 import {useSocket, useSocketState} from '../../hooks/useSocket';
 
 import url from 'url'
 
+import { DndProvider } from 'react-dnd'
+import MultiBackend from 'react-dnd-multi-backend';
+import HTML5toTouch from 'react-dnd-multi-backend/dist/esm/HTML5toTouch'; // or any other pipeline
 
-import {useDropzone} from 'react-dropzone';
+import DragLayer from "./DragLayer";
+
 import Uploader from "../Upload/Uploader";
 import Spinner from "../Spinner";
 import Fab from "../Fab";
@@ -107,20 +111,50 @@ function handleCheckboxChange(item, selected, setSelected) {
     setSelected(isSelected ? selected.filter(elem => elem.name !== item.name) : [...selected, item]);
 }
 
-function onDragStart(e){
-    e.dataTransfer.effectAllowed = "copyMove";
-    e.preventDefault();
-}
+
 
 export default function Playlist(props) {
     const [selected, setSelected] = useState([]);
     const [uploads, setUploads] = useState([]);
 
     const connected = useSocketState();
-    const playlist = useSocket("change", props.items);
+    const serverItems = useSocket("change", props.items);
+    const [localPlaylist, setLocalPlaylist] = useState(null);
     const current = useSocket("current", {});
 
-    const onDrop = useCallback(acceptedFiles=>{
+    const playlist = localPlaylist? localPlaylist : serverItems;
+    const onMoveCard = (dragIndex, hoverIndex)=>{
+        const newPlaylist = [...playlist];
+        //mutate the new playlist
+        const [orig] = newPlaylist.splice(dragIndex,1);
+        newPlaylist.splice(hoverIndex, 0, orig);
+        console.info(newPlaylist);
+        setLocalPlaylist(newPlaylist);
+    }
+
+    const onDropCard = ()=>{
+        const modified_items = playlist.reduce((res, item, index)=>{
+            if(item.rank != index + 1){
+                res.push(Object.assign({}, item, {rank: index +1}));
+            }
+            return res;
+        }, []);
+        Promise.all(modified_items.map(item=> fetch(`/playlist/${encodeURIComponent(item.name)}`,{
+            method:"PUT", 
+            headers:{"Content-Type":"application/json"},
+            body: JSON.stringify({
+                $set:{"rank": item.rank}
+            }),
+        })))
+        .catch(e=>{
+            console.error(e);
+            toast.error("Failed to reoder playlist : " + e.message);
+        }).then(()=>{
+            setLocalPlaylist(null);
+        });
+    }
+
+    const onDropFile = useCallback(acceptedFiles=>{
         let new_uploads = acceptedFiles.filter((f)=>{
             return ! uploads.find((u)=> u["name"] = f["name"] && u["lastModified"] == f["lastModified"])
         }).map((file)=>{
@@ -137,17 +171,14 @@ export default function Playlist(props) {
         }
     })
 
-    const {getRootProps, getInputProps, isDragActive, open} = useDropzone({
-        onDrop,
-        noKeyboard: true,
-        multiple: true
-    });
-   
 
-    let cards = playlist.filter((elem) => props.filterBy(elem)).map(item => {
-        let imgUrl = encodeURI(url.resolve(`http://${props.url}`, `/medias/${item.name}?thumb=true`).trim());
-        return <PlaylistItem 
+    let cards = playlist.map((item, index) => {
+        let imgUrl = encodeURI(`/medias/${item.name}?thumb=true`.trim());
+        return <DraggablePlaylistItem 
+            moveCard={onMoveCard}
+            dropCard={onDropCard}
             key={item.name} 
+            index={index}
             item={item} 
             image={imgUrl}
             current={current.name == item.name}
@@ -179,19 +210,23 @@ export default function Playlist(props) {
     }
 
     let classes = "playlist-container";
-    if(isDragActive) classes += ` drag`;
+    //if(isDragActive) classes += ` drag`;
     if(!connected) classes += ` disconnected`;
     
 
     return (
         
-        <div {...getRootProps({ className:classes, onDragStart:onDragStart, onDragOver:e=>e.preventDefault(), onClick:(e)=>{e.target.classList.contains("fab-container") || e.stopPropagation()}})}>
-            <input {...getInputProps()} />
-            <div className="playlist-content-wrap">
-                {content}
-            </div>
+        <div className={classes} onClick={(e)=>{e.target.classList.contains("fab-container") || e.stopPropagation()}}>
+            <DndProvider backend={MultiBackend} options={HTML5toTouch}>
+                <DragLayer items={playlist}/>
+                <div className="playlist-content-wrap">
+                    {content}
+                </div>
+            </DndProvider>
+            
             <div className="playlist-drawer">
-                <a onClick={(e)=>open(e)} title="Upload a new media"><UploadIcon/></a>
+                <input style={{display:"none"}} type="file" multiple={true} onChange={(e)=>onDropFile(Array.from(e.target.files))} title="Upload a new media" id="file-upload-button"/>
+                <label className="" htmlFor="file-upload-button"><UploadIcon/></label>
                 <span className="folded-drawer-item" >
                     <a className="fold d-folded" onClick={(e)=>e.currentTarget.parentNode.classList.add("active")} title="Add a new link"><LinkIcon/></a>
                     <a className="fold d-unfolded" onClick={(e)=>e.currentTarget.parentNode.classList.remove("active")} title="fold"><CloseIcon/></a>
@@ -202,6 +237,7 @@ export default function Playlist(props) {
                 </Spinner>
                 {Array.isArray(selected) && 0 < selected.length && (<React.Fragment>
                 <a onClick={()=>deleteSelection(selected)} title="Delete selected"><RemoveIcon/></a>
+                <a onClick={()=>setSelected([])} title="deselect all"><CloseIcon/></a>
                 </React.Fragment>)}
             </div>
         </div>

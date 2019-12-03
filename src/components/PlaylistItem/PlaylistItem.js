@@ -4,12 +4,13 @@ import Card from '../Card';
 import Checkbox from '../Checkbox';
 import Icon from '../Icon';
 import PropTypes from 'prop-types'
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 import Switch from '../Switch';
 import MapEditor from '../MapEditor';
 
 import IconClose from "../../icons/close.svg";
 
+import { useDrag, useDrop } from 'react-dnd'
 
 const itemShape = PropTypes.shape({
     name: PropTypes.string.isRequired,
@@ -157,9 +158,52 @@ PlaylistItem.defaultProps = {
     image: undefined,
     selected: false,
     visible: true,
+    disabled: false,
     onClick: () => {},
     onPlay: () => {},
     onRemove: () => {},
     onSwitchChange: () => {},
     onCheckboxChange: () => {}
 }
+
+export function DraggablePlaylistItem({item, moveCard, dropCard, index, ...props}){
+    const id = item.name;
+    const ref = useRef(null);
+
+    const [, drop] = useDrop({
+        accept: "card",
+        drop:dropCard,
+        hover(item, monitor) {
+        if (!ref.current) {
+            return
+        }
+        const dragIndex = item.index
+        const hoverIndex = index
+        // Don't replace items with themselves
+        if (dragIndex === hoverIndex) {
+            return
+        }
+
+        // Time to actually perform the action
+        moveCard(dragIndex, hoverIndex)
+        // Note: we're mutating the monitor item here!
+        // Generally it's better to avoid mutations,
+        // but it's good here for the sake of performance
+        // to avoid expensive index searches.
+        item.index = hoverIndex
+        },
+    })
+    const [{ isDragging }, drag] = useDrag({
+        item: { type: "card", id, index },
+        collect: monitor => ({
+        isDragging: monitor.isDragging(),
+        }),
+    })
+    drag(drop(ref))
+    return (<div ref={ref} className="drag-container" style={{opacity: isDragging? 0.3:1}}><PlaylistItem  item={item} {...props}/></div>)
+}
+DraggablePlaylistItem.propTypes = Object.assign({}, PlaylistItem.propTypes, {
+    moveCard: PropTypes.func.isRequired,
+    dropCard: PropTypes.func.isRequired,
+    index: PropTypes.number.isRequired,
+})

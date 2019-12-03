@@ -74,24 +74,26 @@
 }
 
 
-
-.playlist-container .playlist-drawer a{
-    padding: 4px;
-    border-radius: 4px;
-    border: 1px solid currentColor;
-    background: white;
-    color: theme-color("primary");
-    margin: 2px;
-    width:34px;
+.playlist-container .playlist-drawer{
+    a, label{
+        padding: 4px;
+        border-radius: 4px;
+        border: 1px solid currentColor;
+        background: white;
+        color: theme-color("primary");
+        margin: 2px;
+        width:34px;
+        &:hover {
+            color: theme-color-level("primary", -5);
+        }
+    }
+    
 }
 
 .playlist-container svg path:not([fill]){
     fill: currentColor;
 }
-.playlist-container .playlist-drawer a:hover {
-    color: theme-color-level("primary", -5);
-}
-.playlist-container .playlist-drawer input{
+.playlist-container .playlist-drawer input[type="text"]{
     position:absolute;
 
 }
@@ -107,4 +109,11 @@
 
 .playlist-container .folded-drawer-item.active .fold.d-folded {
     display: none;
+}
+
+.drag-item-container {
+    display: 'block';
+    width:200px;
+    height:200px;
+    opacity: 0.90;
 }
