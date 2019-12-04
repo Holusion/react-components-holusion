@@ -87,6 +87,10 @@
             color: theme-color-level("primary", -5);
         }
     }
+    .drawer-spacer{
+        min-width: 0;
+        flex-grow: 1;
+    }
     
 }
 
@@ -112,7 +116,7 @@
 }
 
 .drag-item-container {
-    display: 'block';
+    display: 'inline-block';
     width:200px;
     height:200px;
     opacity: 0.90;

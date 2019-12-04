@@ -37,7 +37,15 @@ export default function DragLayer({items}){
               console.warn("Unable to make D&D preview");
               placeholder= null;
           }else{
-              placeholder = (<ItemPlaceholder image={encodeURI(`/medias/${element.name}?thumb=true`.trim())} item={element} style={{transform:`rotate(3deg) translate(${x}px, ${y}px)`}}/>);
+              placeholder = (<ItemPlaceholder 
+                image={encodeURI(`/medias/${element.name}?thumb=true`.trim())} 
+                item={element} 
+                style={{
+                    transformOrigin: `${initialOffset.x}px ${initialOffset.y}px`,
+                    WebkitTransform: `rotate(3deg) translate(${x}px, ${y}px)`,
+                    transform:`rotate(3deg) translate(${x}px, ${y}px)`,
+                }}
+            ></ItemPlaceholder>);
           }
           
           break;

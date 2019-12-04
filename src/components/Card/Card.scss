@@ -24,6 +24,8 @@
 .card .card-content {
     z-index: 0;
     flex-grow: 1;
+    flex-shrink: 1;
+    min-height: 0; //allow flex-shrink
     position: relative;
     display: flex;
     flex-direction: column;

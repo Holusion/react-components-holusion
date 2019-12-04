@@ -10,7 +10,7 @@ import url from 'url'
 import { DndProvider } from 'react-dnd'
 import MultiBackend from 'react-dnd-multi-backend';
 import HTML5toTouch from 'react-dnd-multi-backend/dist/esm/HTML5toTouch'; // or any other pipeline
-
+import HTML5Backend from 'react-dnd-html5-backend';
 import DragLayer from "./DragLayer";
 
 import Uploader from "../Upload/Uploader";
@@ -26,7 +26,13 @@ import RemoveIcon from "../../icons/remove.svg"
 import RefreshIcon from "../../icons/refresh.svg";
 import PoweroffIcon from "../../icons/baseline-power_off-24px.svg";
 
+import ForwardIcon from "../../icons/forward.svg";
+import BackIcon from "../../icons/back.svg";
+
 import { toast } from 'react-toastify';
+
+const hasDnd = 'ondragstart' in document.body && "ondrop" in document.body;
+
 
 function play(item) {
     let options = {
@@ -88,11 +94,11 @@ function setActive(item) {
 }
 
 function unselectItem(item, selected, setSelected) {
-    setSelected(selected.filter(elem => elem.name !== item.name))
+    setSelected(selected.filter(name => name !== item.name))
 }
 
 function selectOneItem(item, setSelected) {
-    setSelected([item]);
+    setSelected([item.name]);
 }
 
 
@@ -107,8 +113,8 @@ function handleClick(props, item, selected, setSelected, event) {
 }
 
 function handleCheckboxChange(item, selected, setSelected) {
-    const isSelected = selected.findIndex(elem => item.name === elem.name) != -1;
-    setSelected(isSelected ? selected.filter(elem => elem.name !== item.name) : [...selected, item]);
+    const isSelected = selected.findIndex(name => item.name === name) != -1;
+    setSelected(isSelected ? selected.filter(name => name !== item.name) : [...selected, item.name]);
 }
 
 
@@ -128,17 +134,20 @@ export default function Playlist(props) {
         //mutate the new playlist
         const [orig] = newPlaylist.splice(dragIndex,1);
         newPlaylist.splice(hoverIndex, 0, orig);
-        console.info(newPlaylist);
         setLocalPlaylist(newPlaylist);
+        return newPlaylist;
     }
 
-    const onDropCard = ()=>{
-        const modified_items = playlist.reduce((res, item, index)=>{
+    const commitRearange = (newPlaylist)=>{
+
+        newPlaylist = newPlaylist || playlist;
+        const modified_items = newPlaylist.reduce((res, item, index)=>{
             if(item.rank != index + 1){
                 res.push(Object.assign({}, item, {rank: index +1}));
             }
             return res;
         }, []);
+        console.info("Changed items : ", modified_items);
         Promise.all(modified_items.map(item=> fetch(`/playlist/${encodeURIComponent(item.name)}`,{
             method:"PUT", 
             headers:{"Content-Type":"application/json"},
@@ -176,14 +185,14 @@ export default function Playlist(props) {
         let imgUrl = encodeURI(`/medias/${item.name}?thumb=true`.trim());
         return <DraggablePlaylistItem 
             moveCard={onMoveCard}
-            dropCard={onDropCard}
+            dropCard={()=>commitRearange()}
             key={item.name} 
             index={index}
             item={item} 
             image={imgUrl}
             current={current.name == item.name}
             visible = {item.visible != null ? false : true}
-            selected={selected.filter(elem => item.name === elem.name).length > 0}
+            selected={selected.filter(name => item.name === name).length > 0}
             onPlay={() => play(item)}
             onClick={(event) => handleClick(props, item, selected, setSelected, event)}
             onCheckboxChange={() => handleCheckboxChange(item, selected, setSelected)}
@@ -212,12 +221,18 @@ export default function Playlist(props) {
     let classes = "playlist-container";
     //if(isDragActive) classes += ` drag`;
     if(!connected) classes += ` disconnected`;
-    
-
+    let firstSelectedItem = playlist.find(item => item.name == selected[0]) || {};
+    let canMoveRight = (selected.length == 1 && firstSelectedItem.rank < playlist.length);
+    let canMoveLeft = (selected.length == 1 && 1 <= firstSelectedItem.rank-1); //ranks start at 1 because reasons
+    function moveButton(offset){
+        const idx = playlist.findIndex(item => item.name == selected[0]);
+        if(idx == -1) return toast.error(`Can't find selected item : ${selected[0]}`, );
+        console.info("move %d to %d", idx, idx + offset)
+        commitRearange(onMoveCard(idx, idx+offset));
+    }
     return (
-        
         <div className={classes} onClick={(e)=>{e.target.classList.contains("fab-container") || e.stopPropagation()}}>
-            <DndProvider backend={MultiBackend} options={HTML5toTouch}>
+            <DndProvider backend={HTML5Backend} options={HTML5toTouch}>
                 <DragLayer items={playlist}/>
                 <div className="playlist-content-wrap">
                     {content}
@@ -225,6 +240,9 @@ export default function Playlist(props) {
             </DndProvider>
             
             <div className="playlist-drawer">
+                <Spinner active={!connected} style={{color:"var(--theme-primary)", margin: 0}} size={34} title="Connection lost...">
+                    <PoweroffIcon  style={{opacity:0.4, padding:"5px"}}/>
+                </Spinner>
                 <input style={{display:"none"}} type="file" multiple={true} onChange={(e)=>onDropFile(Array.from(e.target.files))} title="Upload a new media" id="file-upload-button"/>
                 <label className="" htmlFor="file-upload-button"><UploadIcon/></label>
                 <span className="folded-drawer-item" >
@@ -232,12 +250,13 @@ export default function Playlist(props) {
                     <a className="fold d-unfolded" onClick={(e)=>e.currentTarget.parentNode.classList.remove("active")} title="fold"><CloseIcon/></a>
                     <SendLink className="fold d-unfolded" style={{position:"absolute", top: 0, left: "-300px"}} uri={`http://${props.url}`}/>                    
                 </span>
-                <Spinner active={!connected} style={{color:"var(--theme-primary)", margin: 0}} size={34} title="Connection lost...">
-                    <PoweroffIcon  style={{opacity:0.4, padding:"5px"}}/>
-                </Spinner>
-                {Array.isArray(selected) && 0 < selected.length && (<React.Fragment>
-                <a onClick={()=>deleteSelection(selected)} title="Delete selected"><RemoveIcon/></a>
-                <a onClick={()=>setSelected([])} title="deselect all"><CloseIcon/></a>
+                <span className="drawer-spacer d-md-none"/>
+                {canMoveRight && <a onClick={()=>moveButton(1)}><ForwardIcon/></a>}
+                {canMoveLeft && <a onClick={()=>moveButton(-1)}><BackIcon/></a>}
+                <span className="drawer-spacer d-md-none"/>
+                {0 < selected.length && (<React.Fragment>
+                    <a onClick={()=>deleteSelection(selected)} title="Delete selected"><RemoveIcon/></a>
+                    <a onClick={()=>setSelected([])} title="deselect all"><CloseIcon/></a>
                 </React.Fragment>)}
             </div>
         </div>
