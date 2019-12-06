@@ -1,7 +1,7 @@
 
 import React, { memo } from 'react'
 import { useDragLayer } from 'react-dnd'
-
+import { NativeTypes } from 'react-dnd-html5-backend'
 import PlaylistItem from "../PlaylistItem";
 
 const ItemPlaceholder = memo((props)=>{
@@ -49,6 +49,9 @@ export default function DragLayer({items}){
           }
           
           break;
+    case NativeTypes.FILE :
+        console.warn("Drop file!")
+        placeholder=(<div>Drop file here !</div>)
       default:
           console.warn("Unknown drag type : ", itemType);
           placeholder= null;

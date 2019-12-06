@@ -96,7 +96,7 @@ ItemConfig.propTypes = {
     active: PropTypes.bool.isRequired,
 }
 
-export default function PlaylistItem(props) {
+const PlaylistItem = React.forwardRef((props,ref)=> {
     const [withConfig, showConfig] = useState(false);
     const bottom = (
         <div className="playlist-item-bottom">
@@ -130,7 +130,7 @@ export default function PlaylistItem(props) {
         })
     }
     return (
-        <div className={`playlist-item ${props.selected ? "selected" : ""} ${props.item.active ? "active" : ""} ${props.visible ? "visible" : ""}`} onClick={props.onClick} title={props.item.name}>
+        <div ref={ref} className={`playlist-item ${props.selected ? "selected" : ""} ${props.item.active ? "active" : ""} ${props.visible ? "visible" : ""} ${withConfig?"with-config":""}`} onClick={props.onClick} title={props.item.name}>
             {withConfig && (<ItemConfig onClose={()=>showConfig(false)} onChange={value =>handleChange("conf", value)} {...props.item}/>)}
             <Card
                 top={<ItemTop {...props}/>}  
@@ -142,7 +142,7 @@ export default function PlaylistItem(props) {
             </Card>
         </div>
     )
-}
+})
 
 PlaylistItem.propTypes = {
     item: itemShape.isRequired,
@@ -168,7 +168,7 @@ PlaylistItem.defaultProps = {
     onSwitchChange: () => {},
     onCheckboxChange: () => {}
 }
-
+export default PlaylistItem;
 export function DraggablePlaylistItem({item, moveCard, dropCard, index, ...props}){
     const id = item.name;
     const ref = useRef(null);
@@ -197,11 +197,12 @@ export function DraggablePlaylistItem({item, moveCard, dropCard, index, ...props
         collect: monitor => ({
             isDragging: monitor.isDragging(),
         }),
+        canDrag: ()=> ref.current.classList.findIndex("with-config") == -1
     })
 
     drag(drop(ref));
-    return (<div ref={ref} className="drag-container" style={{opacity: isDragging? 0.3:1}}>
-        <PlaylistItem item={item} {...props}/>
+    return (<div className="drag-container" style={{opacity: isDragging? 0.3:1}}>
+        <PlaylistItem ref={ref} item={item} {...props}/>
     </div>)
 }
 DraggablePlaylistItem.propTypes = Object.assign({}, PlaylistItem.propTypes, {

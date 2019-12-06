@@ -7,8 +7,8 @@ import {useSocket, useSocketState} from '../../hooks/useSocket';
 
 import url from 'url'
 
-import { DndProvider } from 'react-dnd'
-import HTML5Backend from 'react-dnd-html5-backend';
+import { DndProvider, useDrop } from 'react-dnd'
+import HTML5Backend, {NativeTypes} from 'react-dnd-html5-backend';
 import DragLayer from "./DragLayer";
 
 import Uploader from "../Upload/Uploader";
@@ -116,7 +116,25 @@ function handleCheckboxChange(item, selected, setSelected) {
     setSelected(isSelected ? selected.filter(name => name !== item.name) : [...selected, item.name]);
 }
 
+function PlaylistContentWrap({children, onDrop, connected}){
+    const [{isDragging}, drop] = useDrop({
+        accept: NativeTypes.FILE,
+        drop: onDrop,
+        collect: monitor => ({
+            isDragging: monitor.isOver({shallow: false}) && monitor.canDrop(),
+        })
+    })
+    return (<div ref={drop} className="playlist-content-wrap">
+        {isDragging && connected && <div key="drag-overlay" className="playlist-drag-overlay"/>}
+        {children}
+    </div>)
+}
 
+PlaylistContentWrap.propTypes = {
+    onDrop: PropTypes.func.isRequired,
+    connected: PropTypes.bool,
+    children: PropTypes.any,
+}
 
 export default function Playlist(props) {
     const [selected, setSelected] = useState([]);
@@ -126,6 +144,7 @@ export default function Playlist(props) {
     const serverItems = useSocket("change", props.items);
     const [localPlaylist, setLocalPlaylist] = useState(null);
     const current = useSocket("current", {});
+
 
     const playlist = localPlaylist? localPlaylist : serverItems;
     const onMoveCard = (dragIndex, hoverIndex)=>{
@@ -162,21 +181,20 @@ export default function Playlist(props) {
             setLocalPlaylist(null);
         });
     }
-
-    const onDropFile = useCallback(acceptedFiles=>{
+    const onDropFiles = useCallback(acceptedFiles=>{
         let new_uploads = acceptedFiles.filter((f)=>{
             return ! uploads.find((u)=> u["name"] = f["name"] && u["lastModified"] == f["lastModified"])
         }).map((file)=>{
             return {
-                item: (<Uploader file={file} url={url.resolve(`http://${props.url}`, "/medias")} key={file.path}/>),
+                item: (<Uploader file={file} url={url.resolve(`http://${props.url}`, "/medias")} key={file.name+file.lastModified} />),
                 lastModified: file.lastModified,
                 name: file.name,
-                path: file.path
+                path: file.path //Drag & drop files have no path property!
             };
         })
         if(new_uploads.length != 0){
             console.log("adding a new Upload");
-            setUploads([].concat(uploads, new_uploads));
+            setUploads(uploads.concat(new_uploads));
         }
     })
 
@@ -234,16 +252,16 @@ export default function Playlist(props) {
         <div className={classes} onClick={(e)=>{e.target.classList.contains("fab-container") || e.stopPropagation()}}>
             <DndProvider backend={HTML5Backend}>
                 <DragLayer items={playlist}/>
-                <div className="playlist-content-wrap">
+                <PlaylistContentWrap onDrop={(e)=>onDropFiles(e.files)} connected={connected}>
                     {content}
-                </div>
+                </PlaylistContentWrap>
             </DndProvider>
             
             <div className="playlist-drawer">
                 <Spinner active={!connected} style={{color:"var(--theme-primary)", margin: 0}} size={34} title="Connection lost...">
                     <PoweroffIcon  style={{opacity:0.4, padding:"5px"}}/>
                 </Spinner>
-                <input style={{display:"none"}} type="file" multiple={true} onChange={(e)=>onDropFile(Array.from(e.target.files))} title="Upload a new media" id="file-upload-button"/>
+                <input style={{display:"none"}} type="file" multiple={true} onChange={(e)=>onDropFiles(Array.from(e.target.files))} title="Upload a new media" id="file-upload-button"/>
                 <label className="" htmlFor="file-upload-button"><UploadIcon/></label>
                 <span className="folded-drawer-item" >
                     <a className="fold d-folded" onClick={(e)=>e.currentTarget.parentNode.classList.add("active")} title="Add a new link"><LinkIcon/></a>

@@ -20,6 +20,7 @@ export default function Uploader(props){
         setError({code:xhr.status, message: xhr.statusText});
       }else{
         setProgress("done");
+        setTimeout(props.onDone, 0);
       }
     }
 
@@ -65,4 +66,7 @@ export default function Uploader(props){
 
 Uploader.propTypes = {
   onDone: PropTypes.func
+}
+Uploader.defaultProps = {
+  onDone: function(){},
 }

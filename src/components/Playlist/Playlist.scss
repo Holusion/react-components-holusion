@@ -5,27 +5,7 @@
     display: flex;
     flex-direction: column-reverse;
     justify-self: stretch;
-    &.drag{
-        opacity:0.5;
-        &:before{
-            content:"Drop files here";
-            color: white;
-            background: rgba(0,0,0, 0.3);
-            opacity: 1;
-            font-size: 2rem;
-            display:block;
-            width:100%;
-            height:100%;
-            min-height: 200px;
-            padding-top: 100px;
-            position: absolute;
-            z-index: 10;
-            margin: auto;
-            box-sizing: border-box;
-            text-align: center;
-            border: 3px dashed var(--theme-primary);
-        }
-    }
+    flex-grow: 1;
 }
 .playlist-container .playlist-drawer{
     display: flex;
@@ -44,7 +24,19 @@
 .playlist-container .playlist-content-wrap {
     padding: 10px 0;
     flex-grow: 1;
+    .playlist-drag-overlay{
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 19;
+        background-color:rgba(0, 0, 0, 0.2);
+        min-height: 60vh;
+        border: 4px dotted $primary;
+    }
 }
+
 .playlist-container .playlist-content {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, max-content));
