@@ -18,11 +18,11 @@ export default function DragLayer({items}){
       initialOffset,
       currentOffset,
   } = useDragLayer(monitor => ({
-  item: monitor.getItem(),
-  itemType: monitor.getItemType(),
-  initialOffset: monitor.getInitialSourceClientOffset(),
-  currentOffset: monitor.getSourceClientOffset(),
-  isDragging: monitor.isDragging(),
+    item: monitor.getItem(),
+    itemType: monitor.getItemType(),
+    initialOffset: monitor.getInitialSourceClientOffset(),
+    currentOffset: monitor.getSourceClientOffset(),
+    isDragging: monitor.isDragging(),
   }))
   if (!isDragging || !currentOffset) {
       return null

@@ -96,7 +96,7 @@ export default function MapEditor(props){
   return (
     <div className="w-100">
       <div className="w-100 d-flex justify-content-between align-items-center">
-        <h3>Configuration</h3>
+        {props.title && (<h3>{props.title}</h3>)}
         <button onClick={saveChanges} className={`btn text-${hasChanges?"warning":"success"}`} title={hasChanges?"changementss en attente":"sauvegardé"}>
           {isLoading? <span className="spinner-border spinner-border-sm" role="status"/> : <IconSave/>}
         </button>
@@ -114,7 +114,8 @@ export default function MapEditor(props){
 MapEditor.propTypes = {
   items: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.string)),PropTypes.instanceOf(Map)]).isRequired,
   editable: PropTypes.bool,
-  onChange: PropTypes.func.isRequired
+  onChange: PropTypes.func.isRequired,
+  title: PropTypes.string,
 }
 
 MapEditor.defaultProps =  {

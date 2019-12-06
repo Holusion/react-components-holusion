@@ -3,7 +3,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import Spinner from "../Spinner";
-import Radio from '../Radio';
 import MapEditor from '../MapEditor';
 
 import ScreenLayout from "./ScreenLayout";
@@ -39,7 +38,6 @@ export default function Config(props){
       return toast.error(`Failed to save config (${body.code}) : ${body.message}`);
     }
   }
- console.log("Configuration values : ", opts.mimeapps, opts.screens); 
   return (
     <div className="product-configuration" >
       <div className="row no-gutters">
@@ -56,17 +54,20 @@ export default function Config(props){
         </div>
       </div>
       <div className="row no-gutters">
-        <div className="col">
-          <label>Play content in loop or stop after each item?</label>
-          <div className="form-group">
-            <Radio items={[{label:"loop", value:true}, {label:"don't loop", value: false}]} checked={opts.loop} onChange={val=>handleChange("loop", val == 'true')}/> 
+        <div className="col py-4">
+          <div className="custom-control custom-switch">
+            <input type="checkbox" className="custom-control-input" title="" id="config-loop" defaultChecked={opts.loop} onChange={e=>handleChange("loop", e.target.checked)} />
+            <label className="custom-control-label" htmlFor="config-loop">Play content in loop</label>
+          </div>
+          <div className="custom-control custom-switch">
+            <input type="checkbox" className="custom-control-input" title="" id="config-loop" defaultChecked={opts.mediaReplaceSelf} onChange={e=>handleChange("mediaReplaceSelf", e.target.checked)} />
+            <label className="custom-control-label" htmlFor="config-loop">Restart a media if it is already playing</label>
           </div>
         </div>
       </div>
       <div className="row no-gutters">
         <div className="col">
-          <label>Raccourcis clavier</label>
-          <MapEditor items={opts.shortcuts} onChange={handleChange.bind(null,"shortcuts")}/>
+          <MapEditor title="Raccourcis clavier" items={opts.shortcuts} onChange={handleChange.bind(null,"shortcuts")}/>
           </div>
       </div>
       <div className="row no-gutters pt-4">

@@ -8,8 +8,6 @@ import {useSocket, useSocketState} from '../../hooks/useSocket';
 import url from 'url'
 
 import { DndProvider } from 'react-dnd'
-import MultiBackend from 'react-dnd-multi-backend';
-import HTML5toTouch from 'react-dnd-multi-backend/dist/esm/HTML5toTouch'; // or any other pipeline
 import HTML5Backend from 'react-dnd-html5-backend';
 import DragLayer from "./DragLayer";
 
@@ -51,7 +49,7 @@ function play(item) {
     })
 }
 
-function remove(item) {
+function remove({name}){
     let options = {
         method: 'DELETE',
         body: null,
@@ -59,20 +57,21 @@ function remove(item) {
             'Content-Type': 'application/json'
         },
     }
-    return fetch(`/medias/${encodeURIComponent(item.name)}`, options).then(res => {
+    return fetch(`/medias/${encodeURIComponent(name)}`, options).then(res => {
         if(!res.ok) {
             const err = new Error(`${res.status} - ${res.statusText}`);
-
-        } else {
-            item.visible = false;         
+            throw err;
         }
     }).catch(err => {
-        toast.error(`failed to remove ${item.name} : ${err.message}`);
+        toast.error(`failed to remove ${name} : ${err.message}`);
     })
 }
 
 function deleteSelection(selection){
-    return Promise.all(selection.map(item=>remove(item))) //should not fail as errors are caught in remove()
+    return Promise.all(selection.map(name=>{
+        console.warn("removing", name);
+        return remove({name})
+    })) //should not fail as errors are caught in remove()
 }
 
 function setActive(item) {
@@ -132,6 +131,7 @@ export default function Playlist(props) {
     const onMoveCard = (dragIndex, hoverIndex)=>{
         const newPlaylist = [...playlist];
         //mutate the new playlist
+        console.log("move card", dragIndex, hoverIndex);
         const [orig] = newPlaylist.splice(dragIndex,1);
         newPlaylist.splice(hoverIndex, 0, orig);
         setLocalPlaylist(newPlaylist);
@@ -184,7 +184,7 @@ export default function Playlist(props) {
     let cards = playlist.map((item, index) => {
         let imgUrl = encodeURI(`/medias/${item.name}?thumb=true`.trim());
         return <DraggablePlaylistItem 
-            moveCard={onMoveCard}
+            moveCard={(...args)=>{onMoveCard(...args)}}
             dropCard={()=>commitRearange()}
             key={item.name} 
             index={index}
@@ -232,7 +232,7 @@ export default function Playlist(props) {
     }
     return (
         <div className={classes} onClick={(e)=>{e.target.classList.contains("fab-container") || e.stopPropagation()}}>
-            <DndProvider backend={HTML5Backend} options={HTML5toTouch}>
+            <DndProvider backend={HTML5Backend}>
                 <DragLayer items={playlist}/>
                 <div className="playlist-content-wrap">
                     {content}
@@ -255,7 +255,7 @@ export default function Playlist(props) {
                 {canMoveLeft && <a onClick={()=>moveButton(-1)}><BackIcon/></a>}
                 <span className="drawer-spacer d-md-none"/>
                 {0 < selected.length && (<React.Fragment>
-                    <a onClick={()=>deleteSelection(selected)} title="Delete selected"><RemoveIcon/></a>
+                    <a onClick={()=>deleteSelection(selected).then(()=>setSelected([]))} title="Delete selected"><RemoveIcon/></a>
                     <a onClick={()=>setSelected([])} title="deselect all"><CloseIcon/></a>
                 </React.Fragment>)}
             </div>

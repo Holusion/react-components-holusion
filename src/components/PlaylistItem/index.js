@@ -172,38 +172,34 @@ PlaylistItem.defaultProps = {
 export function DraggablePlaylistItem({item, moveCard, dropCard, index, ...props}){
     const id = item.name;
     const ref = useRef(null);
-
     const [, drop] = useDrop({
         accept: "card",
-        drop:dropCard,
-        hover(item, monitor) {
-        if (!ref.current) {
-            return
-        }
-        const dragIndex = item.index
-        const hoverIndex = index
-        // Don't replace items with themselves
-        if (dragIndex === hoverIndex) {
-            return
-        }
+        drop: dropCard,
+        hover(target) {
+            if (!ref.current) {
+                return
+            }
+            const dragIndex = target.index
+            const hoverIndex = index //Self
+            // Don't replace items with themselves
+            if (dragIndex === hoverIndex) {
+                return
+            }
 
-        // Time to actually perform the action
-        moveCard(dragIndex, hoverIndex)
-        // Note: we're mutating the monitor item here!
-        // Generally it's better to avoid mutations,
-        // but it's good here for the sake of performance
-        // to avoid expensive index searches.
-        item.index = hoverIndex
+            // Time to actually perform the action
+            moveCard(dragIndex, hoverIndex)
+            target.index = hoverIndex
         },
     })
+
     const [{ isDragging }, drag] = useDrag({
         item: { type: "card", id, index },
         collect: monitor => ({
-        isDragging: monitor.isDragging(),
+            isDragging: monitor.isDragging(),
         }),
     })
-    drag(drop(ref));
 
+    drag(drop(ref));
     return (<div ref={ref} className="drag-container" style={{opacity: isDragging? 0.3:1}}>
         <PlaylistItem item={item} {...props}/>
     </div>)
