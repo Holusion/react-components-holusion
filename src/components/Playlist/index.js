@@ -249,7 +249,7 @@ export default function Playlist(props) {
         commitRearange(onMoveCard(idx, idx+offset));
     }
     return (
-        <div className={classes} onClick={(e)=>{e.target.classList.contains("fab-container") || e.stopPropagation()}}>
+        <div className={classes}  data-test="playlist-container" data-test-state={connected?"connected":"disconnected"} onClick={(e)=>{e.target.classList.contains("fab-container") || e.stopPropagation()}}>
             <DndProvider backend={HTML5Backend}>
                 <DragLayer items={playlist}/>
                 <PlaylistContentWrap onDrop={(e)=>onDropFiles(e.files)} connected={connected}>
@@ -257,16 +257,16 @@ export default function Playlist(props) {
                 </PlaylistContentWrap>
             </DndProvider>
             
-            <div className="playlist-drawer">
+            <div data-test="drawer" className="playlist-drawer">
                 <Spinner active={!connected} style={{color:"var(--theme-primary)", margin: 0}} size={34} title="Connection lost...">
                     <PoweroffIcon  style={{opacity:0.4, padding:"5px"}}/>
                 </Spinner>
                 <input style={{display:"none"}} type="file" multiple={true} onChange={(e)=>onDropFiles(Array.from(e.target.files))} title="Upload a new media" id="file-upload-button"/>
-                <label className="" htmlFor="file-upload-button"><UploadIcon/></label>
+                <label data-test="button-upload" className="" htmlFor="file-upload-button"><UploadIcon/></label>
                 <span className="folded-drawer-item" >
-                    <a className="fold d-folded" onClick={(e)=>e.currentTarget.parentNode.classList.add("active")} title="Add a new link"><LinkIcon/></a>
-                    <a className="fold d-unfolded" onClick={(e)=>e.currentTarget.parentNode.classList.remove("active")} title="fold"><CloseIcon/></a>
-                    <SendLink className="fold d-unfolded" style={{position:"absolute", top: 0, left: "-300px"}} uri={`http://${props.url}`}/>                    
+                    <a className="fold d-folded" data-test="button-link-unfold" onClick={(e)=>e.currentTarget.parentNode.classList.add("active")} title="Add a new link"><LinkIcon/></a>
+                    <a className="fold d-unfolded" data-test="button-link-fold" onClick={(e)=>e.currentTarget.parentNode.classList.remove("active")} title="fold"><CloseIcon/></a>
+                    <SendLink className="fold d-unfolded" data-test="button-link-add" style={{position:"absolute", top: 0, left: "-300px"}} uri={`http://${props.url}`}/>                    
                 </span>
                 <span className="drawer-spacer d-md-none"/>
                 {canMoveRight && <a onClick={()=>moveButton(1)}><ForwardIcon/></a>}

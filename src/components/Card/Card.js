@@ -9,7 +9,7 @@ export default function Card({title, children, top, size=200, image, style={}, .
         <div className="card" style={Object.assign(style, {width:size, height:size})} {...props}>
 
             
-            <div className="card-content" style={backGroundStyle}>
+            <div className="card-content" data-test="card-background" style={backGroundStyle}>
                 <div className="card-top">
                     {top}
                 </div>

@@ -27,7 +27,7 @@ function ItemTop(props) {
                 <Switch checked={props.item.active} onChange={props.onSwitchChange}/>
             </div>
             <div className="playlist-item-top-right">
-                <button className="playlist-item-remove" onClick={props.onRemove}>
+                <button data-test="button-remove" className="playlist-item-remove" onClick={props.onRemove}>
                     <Icon name="remove" />
                 </button>
             </div>
@@ -101,7 +101,7 @@ const PlaylistItem = React.forwardRef((props,ref)=> {
     const bottom = (
         <div className="playlist-item-bottom">
             <div className="playlist-item-title" onClick={props.onPlay}>
-                <span>{props.item.name}</span>
+                <span data-test="playlist-item-title">{props.item.name}</span>
             </div>
             <button className="playlist-item-main-action" onClick={(e)=>{e.stopPropagation();showConfig(true)}} >
                     <Icon name="menu" />
@@ -129,8 +129,9 @@ const PlaylistItem = React.forwardRef((props,ref)=> {
             }
         })
     }
+    const classes = `playlist-item ${props.selected ? "selected" : ""} ${props.item.active ? "active" : ""} ${props.visible ? "visible" : ""} ${withConfig?"with-config":""}`;
     return (
-        <div ref={ref} className={`playlist-item ${props.selected ? "selected" : ""} ${props.item.active ? "active" : ""} ${props.visible ? "visible" : ""} ${withConfig?"with-config":""}`} onClick={props.onClick} title={props.item.name}>
+        <div ref={ref} className={classes} data-test="playlist-item" data-test-name={props.item.name} onClick={props.onClick} title={props.item.name}>
             {withConfig && (<ItemConfig onClose={()=>showConfig(false)} onChange={value =>handleChange("conf", value)} {...props.item}/>)}
             <Card
                 top={<ItemTop {...props}/>}  
