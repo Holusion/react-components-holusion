@@ -14,7 +14,7 @@ import IconAdd from "../../icons/note_add.svg";
 function MapLine(props){
   const editable = typeof props.handleChange === "function"; 
   return (
-    <form className="map-editor-line form-group">
+    <form data-test="map-line" data-test-name={props.name} data-test-value={props.value} className="map-editor-line form-group">
       <div className="input-group">
         <div className="input-group-prepend">
           <input name={`keyfor-${props.name}`} type="text" size="8" className="line-name form-control" id="confName" placeholder="identifiant" value={props.name} readOnly />
@@ -42,11 +42,11 @@ function AddMapLine(props){
   return (<form className="map-editor-line new-line" onSubmit={e=> {e.preventDefault(); props.handleAdd(confName.current.value, confValue.current.value)}}>
     <div className="input-group">
       <div className="input-group-prepend">
-        <input type="text" size="8" className="line-name form-control" id="confName" placeholder="identifiant" required ref={confName}/>
+        <input type="text" size="8" className="line-name form-control" data-test="map-editor-add-key" id="confName" placeholder="identifiant" required ref={confName}/>
       </div>
-      <input type="text" size="10" className="line-value form-control" id="confValue" placeholder="valeur" required ref={confValue}/>
+      <input type="text" size="10" className="line-value form-control" data-test="map-editor-add-value" id="confValue" placeholder="valeur" required ref={confValue}/>
       <div className="input-group-append">
-      <Button type="submit" className="btn btn-outline-secondary"><IconAdd/></Button>
+      <Button type="submit" className="btn btn-outline-secondary" data-test="map-editor-add-confirm"><IconAdd/></Button>
       </div>
     </div>
   </form>)

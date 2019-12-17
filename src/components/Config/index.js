@@ -66,7 +66,7 @@ export default function Config(props){
         </div>
       </div>
       <div className="row no-gutters">
-        <div className="col">
+        <div className="col" data-test="keyboard-shortcuts">
           <MapEditor title="Raccourcis clavier" items={opts.shortcuts} onChange={handleChange.bind(null,"shortcuts")}/>
           </div>
       </div>
