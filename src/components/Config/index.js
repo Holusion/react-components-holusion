@@ -60,8 +60,8 @@ export default function Config(props){
             <label className="custom-control-label" htmlFor="config-loop">Play content in loop</label>
           </div>
           <div className="custom-control custom-switch">
-            <input type="checkbox" className="custom-control-input" title="" id="config-loop" defaultChecked={opts.mediaReplaceSelf} onChange={e=>handleChange("mediaReplaceSelf", e.target.checked)} />
-            <label className="custom-control-label" htmlFor="config-loop">Restart a media if it is already playing</label>
+            <input type="checkbox" className="custom-control-input" title="" id="config-replace" defaultChecked={opts.mediaReplaceSelf} onChange={e=>handleChange("mediaReplaceSelf", e.target.checked)} />
+            <label className="custom-control-label" htmlFor="config-replace">Restart a media if it is already playing</label>
           </div>
         </div>
       </div>
