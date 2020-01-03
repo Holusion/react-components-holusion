@@ -35,6 +35,18 @@ Line.propTypes =  {
   severity: PropTypes.oneOf(["emerg", "alert", "crit", "err", "warning", "notice", "info", "debug"]),
 }
 
+
+function reviveLine(key, value){
+  switch(key){
+    case "@timestamp":
+      return new Date(value);
+    case "@version":
+      return parseInt(value);
+    default:
+      return value;
+  }
+}
+
 export default function Logs(props){
   const socket = useConnect();
   const connected = useSocketState();
@@ -42,7 +54,14 @@ export default function Logs(props){
   useEffect(()=>{
     if(!socket) return;
     function onNewLine(line){
-      setLines(lines=> [...lines, JSON.parse(line, (key, value)=> ((key === "@timestamp")?new Date(value): value))]);
+      let d;
+      try{
+        d = JSON.parse(line, reviveLine)
+      }catch(e){
+        console.warn("Failed to parse %s : ", line, e);
+        d = {"@timestamp":new Date(), severity:"alert", "@version": 1, message:`PARSE FAILED! ${line}`};
+      }
+      setLines(lines=> [...lines, d]);
     }
     function onError(e){
       toast.error(`Failed to get logs : ${e.message}`);
