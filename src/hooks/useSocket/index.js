@@ -1,12 +1,16 @@
 import {useContext, useEffect, useState} from 'react';
 import { SocketContext } from './store/context';
 
+export function useConnect(){
+    return useContext(SocketContext);
+}
+
 export function useSocket(eventKey, initial) {
     const socket = useContext(SocketContext);
     const [data, setData] = useState(initial);
     
     useEffect(() => {
-        if(!socket) return;
+        if(!socket) return ()=>{};
         const handler = function (data){
             //console.log("Socket.on("+eventKey+")", data);
             setData(data);
@@ -20,7 +24,7 @@ export function useSocket(eventKey, initial) {
 
 export function useSocketState(){
     const socket = useContext(SocketContext);
-    const [connected, setConnected] = useState(socket.connected);
+    const [connected, setConnected] = useState((socket)?socket.connected: false);
     useEffect(() => {
         if(!socket) return;
 
@@ -40,7 +44,7 @@ export function useSocketState(){
             socket.removeListener("connected", onconnected);
             socket.removeListener("disconnected", ondisconnected);
         }
-    },[]);
+    },[socket]);
     return connected;
 }
 
