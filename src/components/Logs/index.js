@@ -10,14 +10,29 @@ import PoweroffIcon from "../../icons/baseline-power_off-24px.svg";
 import {useConnect, useSocketState} from '../../hooks/useSocket';
 
 function Line(props){
+  let color = "text-dark";
+  switch(props.severity){
+    case "warning":
+      color="text-warning";
+      break;
+    case "err":
+    case "crit":
+    case "alert":
+    case "emerg":
+      color="text-danger"
+      break;
+  }
   return (<div>
     <span className="text-muted">{props["@timestamp"].toLocaleString()} </span>
+    <span className={color}>[{props.severity}]</span>
     <span>{props.message}</span>
     </div>)
 }
 Line.propTypes =  {
   message: PropTypes.string.isRequired,
   "@timestamp": PropTypes.instanceOf(Date).isRequired,
+  "@version": PropTypes.oneOf([1]),
+  severity: PropTypes.oneOf(["emerg", "alert", "crit", "err", "warning", "notice", "info", "debug"]),
 }
 
 export default function Logs(props){
@@ -39,7 +54,7 @@ export default function Logs(props){
       socket.removeListener("error", onError);
     }
   }, [socket]);
-  
+
   return (<div id="log-lines">
     <div className="d-flex justify-content-between w-100">
       <h2>System logs</h2>
