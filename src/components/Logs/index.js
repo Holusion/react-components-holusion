@@ -53,23 +53,28 @@ export default function Logs(props){
   const [lines, setLines] = useState([]);
   useEffect(()=>{
     if(!socket) return;
-    function onNewLine(line){
+    function onNewLines(newLines){
       let d;
-      try{
-        d = JSON.parse(line, reviveLine)
-      }catch(e){
-        console.warn("Failed to parse %s : ", line, e);
-        d = {"@timestamp":new Date(), severity:"alert", "@version": 1, message:`PARSE FAILED! ${line}`};
-      }
-      setLines(lines=> [...lines, d]);
+      setLines(lines => [
+        ...newLines.map((line)=>{
+          try{
+            d = JSON.parse(line, reviveLine)
+          }catch(e){
+            console.warn("Failed to parse %s : ", line, e);
+            d = {"@timestamp":new Date(), severity:"alert", "@version": 1, message:`PARSE FAILED! ${line}`};
+          }
+          return d;
+        }).reverse(),
+        ...lines,
+      ]);
     }
     function onError(e){
       toast.error(`Failed to get logs : ${e.message}`);
     }
-    socket.on("line", onNewLine);
+    socket.on("lines", onNewLines);
     socket.on("error", onError)
     return ()=>{
-      socket.removeListener("line", onNewLine);
+      socket.removeListener("lines", onNewLines);
       socket.removeListener("error", onError);
     }
   }, [socket]);
@@ -86,7 +91,7 @@ export default function Logs(props){
       )}
       
     </div>
-    <div className="d-flex flex-column-reverse">
+    <div className="d-flex flex-column">
       {lines.map((l, i) => (<Line {...l} key={i}/>))}
     </div>
   </div>)
